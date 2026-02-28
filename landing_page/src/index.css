@@ -1,8 +1,4 @@
-/* ── Fynovo Global Reset & Base ─────────────────────────────── */
-/* All component-level styles live inside FynovoLanding via <style> tags.
-   This file only handles the bare-minimum HTML-level resets so Vite/CRA
-   doesn't inject any conflicting defaults. */
-
+/* ── Fynovo Global Reset — Aqua Blue / Deep Navy Theme ──── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -16,8 +12,8 @@ html {
 
 body {
   min-height: 100vh;
-  background: #05060a;  /* matches --blk in the component */
-  color: #e6e9ef;
+  background: #030d1a;   /* --navy: deep blue base */
+  color: #e8f4ff;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
