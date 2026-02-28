@@ -1,0 +1,38 @@
+/* ── Fynovo Global Reset & Base ─────────────────────────────── */
+/* All component-level styles live inside FynovoLanding via <style> tags.
+   This file only handles the bare-minimum HTML-level resets so Vite/CRA
+   doesn't inject any conflicting defaults. */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background: #05060a;  /* matches --blk in the component */
+  color: #e6e9ef;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+img, video, svg {
+  display: block;
+  max-width: 100%;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
