@@ -205,7 +205,7 @@ function StatCard({ stat, started, i }) {
     if (stat.fmt === "M+") return `${(n / 1e6).toFixed(1)}M+`;
     if (stat.fmt === "$M") return `$${Math.round(n)}M`;
     if (stat.fmt === "K+") return `${Math.round(n / 1000)}K+`;
-    if (stat.fmt === "%")  return `${n.toFixed(1)}%`;
+    if (stat.fmt === "%") return `${n.toFixed(1)}%`;
     return n;
   };
   return (
@@ -224,18 +224,18 @@ function StatCard({ stat, started, i }) {
    APP
 ═══════════════════════════════════════════════════════════════ */
 export default function App() {
-  const [scrolled,   setScrolled]   = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [statsOn,    setStatsOn]    = useState(false);
-  const [billing,    setBilling]    = useState("monthly");
+  const [statsOn, setStatsOn] = useState(false);
+  const [billing, setBilling] = useState("monthly");
   const [activeFeat, setActiveFeat] = useState(0);
-  const [activeAI,   setActiveAI]   = useState(0);
-  const [hovBar,     setHovBar]     = useState(null);
-  const [chartIn,    setChartIn]    = useState(false);
-  const [cursor,     setCursor]     = useState({ x: -400, y: -400 });
+  const [activeAI, setActiveAI] = useState(0);
+  const [hovBar, setHovBar] = useState(null);
+  const [chartIn, setChartIn] = useState(false);
+  const [cursor, setCursor] = useState({ x: -400, y: -400 });
 
-  const statsRef    = useRef(null);
-  const chartRef    = useRef(null);
+  const statsRef = useRef(null);
+  const chartRef = useRef(null);
   const statsInView = useInView(statsRef, 0.3);
   const chartInView = useInView(chartRef, 0.3);
 
@@ -265,14 +265,14 @@ export default function App() {
 
   const STATS = [
     { icon: "📊", end: 2400000, fmt: "M+", label: "Transactions Tracked", dec: 1 },
-    { icon: "💰", end: 890,     fmt: "$M", label: "Revenue Managed",      dec: 0 },
-    { icon: "👥", end: 40000,   fmt: "K+", label: "Active Users",         dec: 0 },
-    { icon: "🔒", end: 99.9,    fmt: "%",  label: "Uptime SLA",           dec: 1 },
+    { icon: "💰", end: 890, fmt: "$M", label: "Revenue Managed", dec: 0 },
+    { icon: "👥", end: 40000, fmt: "K+", label: "Active Users", dec: 0 },
+    { icon: "🔒", end: 99.9, fmt: "%", label: "Uptime SLA", dec: 1 },
   ];
 
   const bars = [38, 55, 42, 71, 50, 83, 62, 91, 58, 78, 68, 100];
-  const mos  = ["J","F","M","A","M","J","J","A","S","O","N","D"];
-  const cur  = AI_CAPABILITIES[activeAI];
+  const mos = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+  const cur = AI_CAPABILITIES[activeAI];
 
   return (
     <>
@@ -285,70 +285,70 @@ export default function App() {
         *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
 
         :root {
-          /* ── CORE PALETTE — Aqua + Deep Blue ── */
-          --navy:     #030d1a;
-          --navy2:    #061428;
-          --navy3:    #0a1f3d;
-          --navy4:    #0d2548;
-          --panel:    #071832;
-          --card:     #0c2040;
-          --card2:    #102850;
+          /* ── CORE PALETTE — Light SaaS ── */
+          --navy:     #F4FAFF;
+          --navy2:    #E8F2FC;
+          --navy3:    #DBEAF8;
+          --navy4:    #D0E3F4;
+          --panel:    #FFFFFF;
+          --card:     #FFFFFF;
+          --card2:    #F8FBFF;
 
           /* borders */
-          --bdr:  rgba(0, 180, 255, 0.10);
-          --bdr2: rgba(0, 180, 255, 0.22);
-          --bdr3: rgba(0, 212, 255, 0.35);
+          --bdr:  rgba(15, 23, 42, 0.06);
+          --bdr2: rgba(15, 23, 42, 0.10);
+          --bdr3: rgba(15, 23, 42, 0.16);
 
           /* text */
-          --txt:    #e8f4ff;
-          --muted:  rgba(180, 215, 240, 0.60);
-          --muted2: rgba(140, 185, 220, 0.38);
+          --txt:    #0F172A;
+          --muted:  #475569;
+          --muted2: #94A3B8;
 
           /* ── BRAND ACCENTS ── */
-          --aqua:       #00d4ff;       /* primary — bright aqua */
-          --aqua2:      #00b8e6;       /* aqua hover */
-          --aqua3:      #00f5c4;       /* secondary — cyan-mint */
-          --blue:       #4facfe;       /* mid blue */
-          --blue2:      #2090f0;       /* deep bright blue */
-          --indigo:     #7b9ff9;       /* soft indigo accent */
+          --aqua:       #0284C7;
+          --aqua2:      #0369A1;
+          --aqua3:      #0D9488;
+          --blue:       #2563EB;
+          --blue2:      #1D4ED8;
+          --indigo:     #6366F1;
 
           /* glows */
-          --glow-aqua:  rgba(0, 212, 255, 0.18);
-          --glow-blue:  rgba(79, 172, 254, 0.15);
-          --glow-mint:  rgba(0, 245, 196, 0.12);
+          --glow-aqua:  rgba(2, 132, 199, 0.08);
+          --glow-blue:  rgba(37, 99, 235, 0.06);
+          --glow-mint:  rgba(13, 148, 136, 0.06);
 
           /* radii */
-          --r:  12px;
-          --rl: 18px;
+          --r:  14px;
+          --rl: 20px;
           --rx: 24px;
-          --rxx:32px;
+          --rxx:28px;
 
           /* shadows */
-          --s1: 0 2px 16px rgba(0,0,0,.5);
-          --s2: 0 8px 40px  rgba(0,0,0,.6);
-          --s3: 0 24px 80px rgba(0,0,0,.65);
+          --s1: 0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
+          --s2: 0 4px 24px rgba(15,23,42,.06), 0 1px 4px rgba(15,23,42,.04);
+          --s3: 0 12px 48px rgba(15,23,42,.08), 0 2px 8px rgba(15,23,42,.04);
         }
 
         html  { scroll-behavior: smooth; }
         body  {
           font-family: 'Plus Jakarta Sans', sans-serif;
-          background: var(--navy);
+          background: #F4FAFF;
           color: var(--txt);
           overflow-x: hidden;
           -webkit-font-smoothing: antialiased;
         }
-        ::selection { background: rgba(0,212,255,.2); color: var(--aqua); }
+        ::selection { background: rgba(2,132,199,.15); color: var(--aqua); }
         ::-webkit-scrollbar       { width: 4px; }
-        ::-webkit-scrollbar-track { background: var(--navy2); }
-        ::-webkit-scrollbar-thumb { background: var(--aqua2); border-radius: 2px; }
+        ::-webkit-scrollbar-track { background: #E8F2FC; }
+        ::-webkit-scrollbar-thumb { background: #94A3B8; border-radius: 2px; }
 
         /* ── CURSOR AURORA ── */
         .cg {
           position: fixed; pointer-events: none; z-index: 0;
           width: 600px; height: 600px; border-radius: 50%;
           background: radial-gradient(circle,
-            rgba(0,212,255,.06) 0%,
-            rgba(79,172,254,.04) 40%,
+            rgba(2,132,199,.04) 0%,
+            rgba(37,99,235,.03) 40%,
             transparent 70%);
           transform: translate(-50%,-50%);
           transition: left .12s linear, top .12s linear;
@@ -363,11 +363,11 @@ export default function App() {
           border-bottom: 1px solid transparent;
         }
         nav.up {
-          background: rgba(3,13,26,.92);
+          background: rgba(255,255,255,.88);
           backdrop-filter: blur(32px);
           -webkit-backdrop-filter: blur(32px);
           border-color: var(--bdr);
-          box-shadow: 0 1px 0 rgba(0,212,255,.06);
+          box-shadow: 0 1px 3px rgba(15,23,42,.06);
         }
 
         .logo {
@@ -428,22 +428,22 @@ export default function App() {
         }
         .btn-ghost:hover {
           color: var(--aqua); border-color: var(--aqua);
-          background: rgba(0,212,255,.06);
+          background: rgba(2,132,199,.05);
         }
 
         .btn-solid {
           font-family: 'Plus Jakarta Sans', sans-serif;
           font-size: 14px; font-weight: 700;
-          color: var(--navy); background: linear-gradient(135deg, var(--aqua) 0%, var(--blue) 100%);
+          color: #FFFFFF; background: linear-gradient(135deg, var(--aqua) 0%, var(--blue) 100%);
           border: none; padding: 10px 24px; border-radius: 100px;
           cursor: pointer; transition: all .28s;
           text-decoration: none; display: inline-block;
-          box-shadow: 0 4px 18px rgba(0,212,255,.28);
+          box-shadow: 0 4px 18px rgba(2,132,199,.22);
         }
         .btn-solid:hover {
           transform: translateY(-2px);
-          box-shadow: 0 8px 32px rgba(0,212,255,.45);
-          background: linear-gradient(135deg, #18dfff 0%, var(--blue) 100%);
+          box-shadow: 0 8px 32px rgba(2,132,199,.35);
+          background: linear-gradient(135deg, #0EA5E9 0%, var(--blue) 100%);
         }
         .btn-xl { font-size: 16px; padding: 15px 42px; }
 
@@ -451,7 +451,7 @@ export default function App() {
         .mob-btn span { display:block; width:22px; height:2px; background:var(--txt); border-radius:2px; }
         .mob-nav {
           position: fixed; top: 70px; left: 0; right: 0;
-          background: rgba(3,13,26,.97); backdrop-filter: blur(28px);
+          background: rgba(255,255,255,.97); backdrop-filter: blur(28px);
           padding: 28px 24px; display: flex; flex-direction: column; gap: 20px;
           z-index: 99; border-top: 1px solid var(--bdr);
         }
@@ -471,18 +471,18 @@ export default function App() {
         .hero-base {
           position: absolute; inset: 0;
           background:
-            radial-gradient(ellipse 90% 60% at 50% -10%, rgba(0,80,160,.55) 0%, transparent 65%),
-            radial-gradient(ellipse 60% 40% at 80% 80%,   rgba(0,40,100,.35) 0%, transparent 60%),
-            radial-gradient(ellipse 50% 50% at 15% 70%,   rgba(0,100,180,.2) 0%, transparent 60%),
-            linear-gradient(180deg, #030d1a 0%, #050f20 50%, #030d1a 100%);
+            radial-gradient(ellipse 90% 60% at 50% -10%, rgba(2,132,199,.08) 0%, transparent 65%),
+            radial-gradient(ellipse 60% 40% at 80% 80%,   rgba(37,99,235,.05) 0%, transparent 60%),
+            radial-gradient(ellipse 50% 50% at 15% 70%,   rgba(13,148,136,.04) 0%, transparent 60%),
+            linear-gradient(180deg, #F4FAFF 0%, #EDF5FF 50%, #F4FAFF 100%);
         }
 
         /* grid lines */
         .hero-grid {
           position: absolute; inset: 0;
           background-image:
-            linear-gradient(rgba(0,180,255,.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,180,255,.04) 1px, transparent 1px);
+            linear-gradient(rgba(2,132,199,.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(2,132,199,.03) 1px, transparent 1px);
           background-size: 60px 60px;
           mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 20%, transparent 100%);
         }
@@ -491,7 +491,7 @@ export default function App() {
         .scan-line {
           position: absolute; left: 0; right: 0;
           height: 1px;
-          background: linear-gradient(90deg, transparent 0%, rgba(0,212,255,.4) 40%, rgba(0,212,255,.4) 60%, transparent 100%);
+          background: linear-gradient(90deg, transparent 0%, rgba(2,132,199,.15) 40%, rgba(2,132,199,.15) 60%, transparent 100%);
           animation: scan 8s linear infinite;
         }
         @keyframes scan {
@@ -505,19 +505,19 @@ export default function App() {
         .blob { position: absolute; border-radius: 50%; filter: blur(80px); }
         .b1 {
           width: 700px; height: 700px;
-          background: radial-gradient(circle, rgba(0,180,255,.13) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(2,132,199,.06) 0%, transparent 70%);
           top: -150px; left: -200px;
           animation: drift 20s ease-in-out infinite;
         }
         .b2 {
           width: 600px; height: 600px;
-          background: radial-gradient(circle, rgba(0,120,220,.10) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(37,99,235,.05) 0%, transparent 70%);
           bottom: -80px; right: -150px;
           animation: drift 25s ease-in-out infinite reverse;
         }
         .b3 {
           width: 400px; height: 400px;
-          background: radial-gradient(circle, rgba(0,245,196,.07) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(13,148,136,.04) 0%, transparent 70%);
           top: 40%; left: 60%;
           animation: drift 16s ease-in-out infinite 5s;
         }
@@ -530,8 +530,8 @@ export default function App() {
         /* hero content */
         .badge {
           display: inline-flex; align-items: center; gap: 9px;
-          background: rgba(0,212,255,.08);
-          border: 1px solid rgba(0,212,255,.25);
+          background: rgba(2,132,199,.06);
+          border: 1px solid rgba(2,132,199,.15);
           padding: 7px 18px; border-radius: 100px;
           font-size: 13px; font-weight: 600; color: var(--aqua);
           margin-bottom: 36px; animation: fadeUp .8s ease both;
@@ -541,7 +541,7 @@ export default function App() {
           width: 7px; height: 7px; border-radius: 50%;
           background: var(--aqua); flex-shrink: 0;
           animation: pdot 2s infinite;
-          box-shadow: 0 0 8px var(--aqua);
+          box-shadow: 0 0 8px rgba(2,132,199,.4);
         }
         @keyframes pdot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.6)} }
 
@@ -556,7 +556,7 @@ export default function App() {
         .hero-h .line1 { display: block; color: var(--txt); }
         .hero-h .aqua-grad {
           display: block;
-          background: linear-gradient(90deg, var(--aqua) 0%, var(--blue) 50%, var(--aqua3) 100%);
+          background: linear-gradient(90deg, var(--aqua) 0%, var(--blue) 50%, var(--indigo) 100%);
           background-size: 200% auto;
           -webkit-background-clip: text; background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -597,18 +597,17 @@ export default function App() {
           position: absolute; top: -40px; left: 50%;
           transform: translateX(-50%);
           width: 80%; height: 80px;
-          background: radial-gradient(ellipse, rgba(0,180,255,.2) 0%, transparent 70%);
+          background: radial-gradient(ellipse, rgba(2,132,199,.08) 0%, transparent 70%);
           filter: blur(24px); pointer-events: none;
         }
         .dash-frame {
-          background: rgba(7,24,50,.95);
+          background: #FFFFFF;
           border: 1px solid var(--bdr2);
           border-radius: var(--rxx); overflow: hidden;
-          box-shadow: var(--s3), 0 0 0 1px rgba(0,212,255,.05) inset,
-                      0 0 60px rgba(0,80,160,.3);
+          box-shadow: var(--s3);
         }
         .dtop {
-          background: rgba(6,20,40,.9);
+          background: #F8FBFF;
           border-bottom: 1px solid var(--bdr);
           padding: 14px 26px; display: flex; align-items: center; gap: 12px;
         }
@@ -635,7 +634,7 @@ export default function App() {
 
         .krow { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
         .kpi {
-          background: rgba(10,31,61,.8);
+          background: #FFFFFF;
           border: 1px solid var(--bdr);
           border-radius: var(--rl); padding: 20px 22px;
           cursor: default; transition: all .28s;
@@ -646,36 +645,36 @@ export default function App() {
           background: linear-gradient(90deg, transparent, var(--aqua), transparent);
           opacity: 0; transition: opacity .3s;
         }
-        .kpi:hover { border-color: var(--bdr2); background: rgba(12,40,80,.9); }
-        .kpi:hover::before { opacity: .6; }
+        .kpi:hover { border-color: var(--bdr2); box-shadow: var(--s2); }
+        .kpi:hover::before { opacity: .4; }
         .ktop { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
         .klbl { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--muted2); font-family:'JetBrains Mono',monospace; }
         .kb   { font-size:10px; font-weight:700; padding:3px 9px; border-radius:100px; font-family:'JetBrains Mono',monospace; }
-        .ku   { background:rgba(0,245,196,.12); color: var(--aqua3); }
-        .kd   { background:rgba(255,90,130,.12); color: #ff7aaa; }
+        .ku   { background:rgba(13,148,136,.08); color: var(--aqua3); }
+        .kd   { background:rgba(239,68,68,.08); color: #EF4444; }
         .kv   { font-size:28px; font-weight:800; letter-spacing:-.04em; margin-bottom:14px; font-family:'Space Grotesk',sans-serif; }
         .kv.a { color: var(--aqua); }
         .kv.m { color: var(--blue); }
-        .kv.r { color: #ff7aaa; }
+        .kv.r { color: #EF4444; }
         .spark { display:flex; align-items:flex-end; gap:3px; height:28px; }
         .sp { flex:1; border-radius:3px 3px 0 0; }
 
         .crows { display:grid; grid-template-columns:2fr 1fr; gap:14px; }
         .ccard {
-          background: rgba(10,31,61,.8);
+          background: #FFFFFF;
           border: 1px solid var(--bdr);
           border-radius: var(--rl); padding: 22px;
         }
         .chd { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
         .cttl { font-size:14px; font-weight:700; }
         .csub { font-size:11px; color:var(--muted2); font-family:'JetBrains Mono',monospace; }
-        .yoy  { font-size:11px; color:var(--aqua3); font-weight:700; background:rgba(0,245,196,.1); padding:4px 11px; border-radius:100px; font-family:'JetBrains Mono',monospace; }
+        .yoy  { font-size:11px; color:var(--aqua3); font-weight:700; background:rgba(13,148,136,.08); padding:4px 11px; border-radius:100px; font-family:'JetBrains Mono',monospace; }
         .bchart { display:flex; align-items:flex-end; gap:5px; height:92px; }
         .bw  { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
         .bar { width:100%; border-radius:4px 4px 0 0; cursor:pointer; min-height:3px; }
         .bmo { font-size:9px; color:var(--muted2); font-family:'JetBrains Mono',monospace; }
         .dcc { display:flex; flex-direction:column; align-items:center; gap:12px; }
-        .dsvg { filter:drop-shadow(0 4px 20px rgba(0,212,255,.2)); }
+        .dsvg { filter:drop-shadow(0 2px 10px rgba(2,132,199,.1)); }
         .dleg { width:100%; display:flex; flex-direction:column; gap:7px; }
         .dl  { display:flex; align-items:center; gap:8px; font-size:11px; }
         .dld { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
@@ -691,17 +690,18 @@ export default function App() {
         /* ── STATS STRIP ── */
         .stats-wrap {
           position: relative;
-          background: rgba(6,20,40,.6);
+          background: #FFFFFF;
           border-top: 1px solid var(--bdr);
           border-bottom: 1px solid var(--bdr);
+          box-shadow: var(--s1);
         }
         .stats-wrap::before {
           content: ''; position: absolute; inset: 0; pointer-events: none;
           background: linear-gradient(90deg,
             transparent 0%,
-            rgba(0,120,220,.04) 30%,
-            rgba(0,212,255,.06) 50%,
-            rgba(0,120,220,.04) 70%,
+            rgba(2,132,199,.02) 30%,
+            rgba(37,99,235,.03) 50%,
+            rgba(2,132,199,.02) 70%,
             transparent 100%);
         }
         .stats-grid {
@@ -723,19 +723,19 @@ export default function App() {
           background: linear-gradient(90deg, transparent, var(--aqua), transparent);
           transition: width .5s;
         }
-        .sc:hover { background: rgba(0,120,220,.06); }
+        .sc:hover { background: rgba(2,132,199,.03); }
         .sc:hover::before { width: 100%; }
         .sc-ico  { font-size: 30px; display: block; margin-bottom: 16px; }
         .sc-num  {
           font-family: 'Space Grotesk', sans-serif;
           font-size: 52px; font-weight: 700;
           letter-spacing: -.055em; display: block; min-height: 64px;
-          background: linear-gradient(135deg, #fff 20%, var(--aqua) 100%);
+          background: linear-gradient(135deg, #0F172A 20%, var(--aqua) 100%);
           -webkit-background-clip: text; background-clip: text;
           -webkit-text-fill-color: transparent;
         }
         .sc-lbl  { font-size: 12px; color: var(--muted2); text-transform: uppercase; letter-spacing: .07em; font-weight: 500; margin-bottom: 24px; font-family:'JetBrains Mono',monospace; }
-        .sc-bar  { height: 1.5px; background: rgba(0,180,255,.1); overflow: hidden; }
+        .sc-bar  { height: 1.5px; background: rgba(2,132,199,.1); overflow: hidden; }
         .sc-fill { height: 100%; background: linear-gradient(90deg, var(--aqua2), var(--aqua), var(--aqua3)); width: 0%; transition: width 2.2s cubic-bezier(.16,1,.3,1); }
 
         /* ── SECTION BASE ── */
@@ -762,8 +762,8 @@ export default function App() {
           cursor: pointer; transition: all .28s;
           border: 1px solid transparent;
         }
-        .fi.on { background: rgba(0,120,200,.12); border-color: var(--bdr2); }
-        .fi:not(.on):hover { background: rgba(0,100,180,.07); }
+        .fi.on { background: rgba(2,132,199,.06); border-color: var(--bdr2); }
+        .fi:not(.on):hover { background: rgba(2,132,199,.03); }
         .fi-row { display:flex; align-items:center; gap:13px; }
         .fi-ico {
           width: 38px; height: 38px; border-radius: 11px;
@@ -777,7 +777,7 @@ export default function App() {
 
         .feat-preview {
           position: sticky; top: 100px;
-          background: rgba(7,24,50,.9);
+          background: #FFFFFF;
           border: 1px solid var(--bdr2);
           border-radius: var(--rxx); padding: 52px 44px;
           min-height: 380px;
@@ -785,7 +785,7 @@ export default function App() {
           align-items: center; justify-content: center;
           text-align: center; overflow: hidden;
           transition: border-color .4s;
-          box-shadow: var(--s2), 0 0 40px rgba(0,80,160,.25) inset;
+          box-shadow: var(--s2);
         }
         .feat-preview::before {
           content: ''; position: absolute; top: 0; left: 0; right: 0;
@@ -799,11 +799,11 @@ export default function App() {
 
         /* ── FYN AI SHOWCASE ── */
         .ai-section {
-          background: radial-gradient(ellipse 100% 80% at 50% 0%, rgba(0,80,180,.2) 0%, transparent 70%),
-                      rgba(6,20,40,.8);
+          background: #FFFFFF;
           border-top: 1px solid var(--bdr);
           border-bottom: 1px solid var(--bdr);
           padding: 120px 0;
+          box-shadow: var(--s1);
         }
         .ai-inner { max-width:1100px; margin:0 auto; padding:0 44px; }
 
@@ -811,7 +811,7 @@ export default function App() {
           display: flex; margin-top: 60px;
           border: 1px solid var(--bdr2);
           border-radius: var(--rxx); overflow: hidden;
-          background: rgba(7,24,50,.9);
+          background: #F8FBFF;
         }
         .ai-tab {
           flex: 1; padding: 22px 26px; cursor: pointer;
@@ -819,8 +819,8 @@ export default function App() {
           position: relative;
         }
         .ai-tab:last-child { border-right: none; }
-        .ai-tab.on { background: rgba(0,80,160,.2); }
-        .ai-tab:not(.on):hover { background: rgba(0,60,120,.12); }
+        .ai-tab.on { background: rgba(2,132,199,.06); }
+        .ai-tab:not(.on):hover { background: rgba(2,132,199,.03); }
         .ai-tab::after {
           content: ''; position: absolute; bottom: 0; left: 0; right: 0;
           height: 2px; transform: scaleX(0); transform-origin: left;
@@ -834,9 +834,10 @@ export default function App() {
         .ai-body {
           display: grid; grid-template-columns: 1fr 1fr; gap: 52px;
           align-items: center; padding: 52px;
-          background: rgba(9,28,56,.7);
+          background: #FFFFFF;
           border: 1px solid var(--bdr); border-top: none;
           border-radius: 0 0 var(--rxx) var(--rxx);
+          box-shadow: var(--s2);
         }
         .ai-body-text h3 { font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; letter-spacing:-.035em; margin-bottom:18px; line-height:1.1; }
         .ai-body-text p  { font-size:15px; color:var(--muted); font-weight:400; line-height:1.75; margin-bottom:30px; }
@@ -845,11 +846,11 @@ export default function App() {
         .ai-point-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
 
         .ai-visual {
-          background: rgba(7,24,50,.95);
+          background: #F8FBFF;
           border: 1px solid var(--bdr2);
           border-radius: var(--rl); padding: 30px;
           position: relative; overflow: hidden;
-          box-shadow: var(--s2), 0 0 30px rgba(0,80,160,.2) inset;
+          box-shadow: var(--s1);
         }
         .ai-visual::before {
           content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
@@ -870,8 +871,8 @@ export default function App() {
         .ai-bar:hover  { opacity: .7; }
 
         .ai-insight-box {
-          background: rgba(0,212,255,.05);
-          border: 1px solid rgba(0,212,255,.18);
+          background: rgba(2,132,199,.04);
+          border: 1px solid rgba(2,132,199,.12);
           border-radius: 11px; padding: 13px 15px;
           display: flex; gap: 11px; align-items: flex-start; margin-top: 4px;
         }
@@ -880,7 +881,7 @@ export default function App() {
 
         .ai-metrics { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:14px; }
         .ai-metric  {
-          background: rgba(6,20,40,.9);
+          background: #FFFFFF;
           border: 1px solid var(--bdr);
           border-radius: 11px; padding: 13px 15px;
           transition: border-color .25s;
@@ -893,12 +894,12 @@ export default function App() {
         .how-section { padding: 120px 0; position: relative; }
         .how-section::before {
           content: ''; position: absolute; inset: 0; pointer-events: none;
-          background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(0,60,140,.15) 0%, transparent 70%);
+          background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(2,132,199,.04) 0%, transparent 70%);
         }
         .how-inner { max-width:1100px; margin:0 auto; padding:0 44px; position:relative; }
         .steps-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:60px; }
         .step-card {
-          background: rgba(7,24,50,.8);
+          background: #FFFFFF;
           border: 1px solid var(--bdr);
           border-radius: var(--rxx); padding: 42px 32px;
           position: relative; overflow: hidden;
@@ -907,7 +908,7 @@ export default function App() {
         .step-card:hover {
           transform: translateY(-8px);
           border-color: var(--bdr3);
-          box-shadow: 0 28px 70px rgba(0,0,0,.5), 0 0 0 1px rgba(0,212,255,.06) inset;
+          box-shadow: var(--s3);
         }
         .step-card::after {
           content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
@@ -917,14 +918,14 @@ export default function App() {
         .step-card:hover::after { transform: scaleX(1); }
         .step-card::before {
           content: ''; position: absolute; top: -1px; left: 0; right: 0; height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(0,212,255,.3), transparent);
+          background: linear-gradient(90deg, transparent, rgba(2,132,199,.15), transparent);
           opacity: 0; transition: opacity .3s;
         }
         .step-card:hover::before { opacity: 1; }
         .snbg {
           position: absolute; top: -15px; right: -5px;
           font-size: 110px; font-weight: 800;
-          color: rgba(0,180,255,.04); line-height: 1;
+          color: rgba(2,132,199,.04); line-height: 1;
           pointer-events: none; font-family: 'Space Grotesk', sans-serif;
           letter-spacing: -.06em; user-select: none;
         }
@@ -938,9 +939,10 @@ export default function App() {
         /* ── PRICING ── */
         .ptog {
           display: inline-flex;
-          background: rgba(6,20,40,.8);
+          background: #FFFFFF;
           border: 1px solid var(--bdr2);
           border-radius: 100px; padding: 4px; margin-top: 24px;
+          box-shadow: var(--s1);
         }
         .ptb {
           padding: 9px 24px; border-radius: 100px; border: none;
@@ -951,19 +953,19 @@ export default function App() {
         }
         .ptb.on {
           background: linear-gradient(135deg, var(--aqua) 0%, var(--blue) 100%);
-          color: var(--navy);
-          box-shadow: 0 4px 16px rgba(0,212,255,.3);
+          color: #FFFFFF;
+          box-shadow: 0 4px 16px rgba(2,132,199,.22);
         }
         .save-chip {
           margin-left: 8px; font-size: 11px; font-weight: 700;
-          color: var(--aqua3); background: rgba(0,245,196,.12);
+          color: var(--aqua3); background: rgba(13,148,136,.08);
           padding: 2px 9px; border-radius: 100px;
           font-family: 'JetBrains Mono', monospace;
         }
 
         .pgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:48px; align-items:start; }
         .pc {
-          background: rgba(7,24,50,.85);
+          background: #FFFFFF;
           border: 1px solid var(--bdr);
           border-radius: var(--rxx); padding: 38px 34px;
           transition: transform .3s, border-color .3s, box-shadow .3s;
@@ -971,14 +973,14 @@ export default function App() {
         }
         .pc::before {
           content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(0,180,255,.25), transparent);
+          background: linear-gradient(90deg, transparent, rgba(2,132,199,.15), transparent);
         }
-        .pc:hover { transform:translateY(-5px); border-color:var(--bdr2); box-shadow:var(--s3), 0 0 30px rgba(0,80,160,.2); }
+        .pc:hover { transform:translateY(-5px); border-color:var(--bdr2); box-shadow:var(--s3); }
         .pc.hi {
-          background: linear-gradient(160deg, rgba(0,80,200,.25) 0%, rgba(0,180,255,.15) 100%);
+          background: linear-gradient(160deg, rgba(2,132,199,.04) 0%, rgba(37,99,235,.03) 100%);
           border-color: var(--aqua2);
           transform: scale(1.035);
-          box-shadow: 0 24px 80px rgba(0,80,160,.4), 0 0 0 1px rgba(0,212,255,.2) inset;
+          box-shadow: 0 12px 48px rgba(2,132,199,.12);
         }
         .pc.hi::before { background: linear-gradient(90deg, transparent, var(--aqua), transparent); opacity: 1; }
         .pc.hi:hover { transform: scale(1.035) translateY(-5px); }
@@ -991,7 +993,7 @@ export default function App() {
           font-family: 'JetBrains Mono', monospace;
         }
         .pname  { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:var(--muted2); margin-bottom:22px; font-family:'JetBrains Mono',monospace; }
-        .pc.hi .pname { color:rgba(180,220,255,.6); }
+        .pc.hi .pname { color:var(--aqua); }
         .pprice { display:flex; align-items:baseline; gap:3px; margin-bottom:8px; }
         .pcur   { font-size:22px; font-weight:600; color:var(--muted); margin-top:7px; }
         .pamt   { font-family:'Space Grotesk',sans-serif; font-size:56px; font-weight:700; color:var(--txt); letter-spacing:-.05em; }
@@ -999,11 +1001,11 @@ export default function App() {
         .pper   { font-size:14px; color:var(--muted); font-weight:400; }
         .pdesc  { font-size:13px; color:var(--muted2); margin-bottom:24px; font-weight:400; }
         .pdiv   { height:1px; background:var(--bdr); margin:22px 0; }
-        .pc.hi .pdiv { background: rgba(0,180,255,.15); }
+        .pc.hi .pdiv { background: rgba(2,132,199,.1); }
         .pfeats { list-style:none; display:flex; flex-direction:column; gap:11px; margin-bottom:30px; }
         .pfeats li { font-size:13px; color:var(--muted); display:flex; align-items:center; gap:10px; font-weight:400; }
-        .pchk   { width:18px; height:18px; border-radius:50%; background:rgba(0,180,255,.1); display:grid; place-items:center; flex-shrink:0; font-size:9px; color:var(--aqua); border: 1px solid rgba(0,180,255,.2); }
-        .pc.hi .pchk { background:rgba(0,212,255,.15); color:var(--aqua); border-color:rgba(0,212,255,.3); }
+        .pchk   { width:18px; height:18px; border-radius:50%; background:rgba(2,132,199,.06); display:grid; place-items:center; flex-shrink:0; font-size:9px; color:var(--aqua); border: 1px solid rgba(2,132,199,.12); }
+        .pc.hi .pchk { background:rgba(2,132,199,.1); color:var(--aqua); border-color:rgba(2,132,199,.2); }
         .pbtn {
           width: 100%; padding: 14px; border-radius: 100px;
           font-family: 'Plus Jakarta Sans', sans-serif;
@@ -1012,22 +1014,20 @@ export default function App() {
           border: 1px solid var(--bdr2);
           background: transparent; color: var(--txt);
         }
-        .pbtn:hover { background: linear-gradient(135deg, var(--aqua), var(--blue)); border-color: var(--aqua); color: var(--navy); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,212,255,.3); }
-        .pc.hi .pbtn { background: linear-gradient(135deg, var(--aqua), var(--blue)); border-color: transparent; color: var(--navy); box-shadow: 0 6px 22px rgba(0,212,255,.35); }
-        .pc.hi .pbtn:hover { box-shadow: 0 10px 32px rgba(0,212,255,.5); transform: translateY(-2px); }
+        .pbtn:hover { background: linear-gradient(135deg, var(--aqua), var(--blue)); border-color: var(--aqua); color: #FFFFFF; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(2,132,199,.22); }
+        .pc.hi .pbtn { background: linear-gradient(135deg, var(--aqua), var(--blue)); border-color: transparent; color: #FFFFFF; box-shadow: 0 6px 22px rgba(2,132,199,.25); }
+        .pc.hi .pbtn:hover { box-shadow: 0 10px 32px rgba(2,132,199,.35); transform: translateY(-2px); }
 
         /* ── TESTIMONIALS ── */
         .testi-section {
           padding: 120px 0;
-          background:
-            radial-gradient(ellipse 80% 50% at 50% 100%, rgba(0,60,140,.18) 0%, transparent 60%),
-            rgba(5,15,35,.5);
+          background: #F8FBFF;
           border-top: 1px solid var(--bdr);
         }
         .testi-inner { max-width:1100px; margin:0 auto; padding:0 44px; }
         .tgrid  { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:60px; }
         .tc {
-          background: rgba(7,24,50,.8);
+          background: #FFFFFF;
           border: 1px solid var(--bdr);
           border-radius: var(--rxx); padding: 36px;
           transition: transform .3s, border-color .3s, box-shadow .3s;
@@ -1035,15 +1035,15 @@ export default function App() {
         }
         .tc::before {
           content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(0,180,255,.2), transparent);
+          background: linear-gradient(90deg, transparent, rgba(2,132,199,.12), transparent);
         }
-        .tc:hover { transform:translateY(-6px); border-color:var(--bdr2); box-shadow:0 24px 60px rgba(0,0,0,.4); }
+        .tc:hover { transform:translateY(-6px); border-color:var(--bdr2); box-shadow:var(--s3); }
         .stars  { display:flex; gap:4px; margin-bottom:18px; }
         .star   { font-size:14px; color:#ffc837; text-shadow: 0 0 8px rgba(255,200,55,.5); }
         .tq     { font-size:15px; line-height:1.75; color:var(--muted); font-weight:400; margin-bottom:24px; }
         .tq::before { content:'"'; font-size:40px; color:var(--aqua); line-height:0; vertical-align:-16px; margin-right:4px; opacity:.3; font-family:'Space Grotesk',sans-serif; }
         .tf     { display:flex; align-items:center; gap:14px; }
-        .tav    { width:44px; height:44px; border-radius:50%; display:grid; place-items:center; font-size:14px; font-weight:800; color:var(--navy); flex-shrink:0; box-shadow:0 4px 14px rgba(0,0,0,.4); }
+        .tav    { width:44px; height:44px; border-radius:50%; display:grid; place-items:center; font-size:14px; font-weight:800; color:#FFFFFF; flex-shrink:0; box-shadow:0 4px 14px rgba(15,23,42,.1); }
         .tname  { font-weight:700; font-size:14px; }
         .trole  { font-size:11px; color:var(--muted2); font-family:'JetBrains Mono',monospace; }
 
@@ -1052,12 +1052,12 @@ export default function App() {
         .cta-box {
           max-width: 1100px; margin: 0 auto;
           background:
-            radial-gradient(ellipse 80% 100% at 50% -20%, rgba(0,100,220,.3) 0%, transparent 70%),
-            rgba(7,24,50,.9);
+            radial-gradient(ellipse 80% 100% at 50% -20%, rgba(2,132,199,.06) 0%, transparent 70%),
+            #FFFFFF;
           border: 1px solid var(--bdr2);
           border-radius: 40px; padding: 96px 64px;
           text-align: center; position: relative; overflow: hidden;
-          box-shadow: var(--s3), 0 0 0 1px rgba(0,212,255,.04) inset;
+          box-shadow: var(--s3);
         }
         .cta-box::before {
           content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
@@ -1067,7 +1067,7 @@ export default function App() {
           content: ''; position: absolute; bottom: 0; left: 50%;
           transform: translateX(-50%);
           width: 60%; height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(0,212,255,.3), transparent);
+          background: linear-gradient(90deg, transparent, rgba(2,132,199,.12), transparent);
         }
         .cta-box h2 {
           font-family: 'Space Grotesk', sans-serif;
@@ -1078,15 +1078,15 @@ export default function App() {
         .cta-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; position:relative; }
         .cbtn  {
           background: linear-gradient(135deg, var(--aqua) 0%, var(--blue) 100%);
-          color: var(--navy); border: none;
+          color: #FFFFFF; border: none;
           padding: 18px 48px; border-radius: 100px;
           font-family: 'Plus Jakarta Sans', sans-serif;
           font-size: 16px; font-weight: 800;
           cursor: pointer; transition: all .3s;
-          box-shadow: 0 6px 24px rgba(0,212,255,.35);
+          box-shadow: 0 6px 24px rgba(2,132,199,.25);
           letter-spacing: .01em;
         }
-        .cbtn:hover { transform:translateY(-3px); box-shadow:0 14px 44px rgba(0,212,255,.5); background:linear-gradient(135deg,#18dfff 0%,var(--blue) 100%); }
+        .cbtn:hover { transform:translateY(-3px); box-shadow:0 14px 44px rgba(2,132,199,.35); background:linear-gradient(135deg,#0EA5E9 0%,var(--blue) 100%); }
         .cbtng {
           background: transparent; color: var(--muted);
           border: 1px solid var(--bdr2);
@@ -1095,13 +1095,13 @@ export default function App() {
           font-size: 16px; font-weight: 600;
           cursor: pointer; transition: all .28s;
         }
-        .cbtng:hover { border-color:var(--aqua); color:var(--aqua); background:rgba(0,212,255,.06); }
+        .cbtng:hover { border-color:var(--aqua); color:var(--aqua); background:rgba(2,132,199,.04); }
 
         /* ── FOOTER ── */
         footer {
           border-top: 1px solid var(--bdr);
           padding: 70px 52px 44px;
-          background: rgba(3,10,22,.8);
+          background: #FFFFFF;
         }
         .ftop { max-width:1100px; margin:0 auto 44px; display:grid; grid-template-columns:1.8fr 1fr 1fr 1fr; gap:52px; }
         .fbrand  { font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; letter-spacing:-.03em; margin-bottom:14px; }
@@ -1114,7 +1114,7 @@ export default function App() {
           font-size: 14px; text-decoration: none;
           color: var(--muted); transition: all .25s;
         }
-        .fsb:hover { border-color:var(--aqua); color:var(--aqua); background:rgba(0,212,255,.08); transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,212,255,.15); }
+        .fsb:hover { border-color:var(--aqua); color:var(--aqua); background:rgba(2,132,199,.05); transform:translateY(-2px); box-shadow:0 6px 18px rgba(2,132,199,.1); }
         .fct    { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--muted2); margin-bottom:18px; font-family:'JetBrains Mono',monospace; }
         .flinks { list-style:none; display:flex; flex-direction:column; gap:11px; }
         .flinks a { font-size:14px; color:var(--muted); text-decoration:none; transition:color .22s; font-weight:400; }
@@ -1173,8 +1173,8 @@ export default function App() {
           ))}
         </ul>
         <div className="nav-r">
-          <a href="#" className="btn-ghost">Log in</a>
-          <a href="#" className="btn-solid">Get started free →</a>
+          <a href="https://fynovo.in/" className="btn-ghost">Log in</a>
+          <a href="https://fynovo.in/" className="btn-solid">Get started free →</a>
           <button className="mob-btn" onClick={() => setMobileOpen((v) => !v)}>
             <span /><span /><span />
           </button>
@@ -1185,12 +1185,12 @@ export default function App() {
         <div className="mob-nav">
           {NAV_LINKS.map((l) => (
             <a key={l}
-               href={`#${l.toLowerCase().replace(/\s+/g, "-")}`}
-               onClick={() => setMobileOpen(false)}>
+              href={`#${l.toLowerCase().replace(/\s+/g, "-")}`}
+              onClick={() => setMobileOpen(false)}>
               {l}
             </a>
           ))}
-          <a href="#" className="btn-solid" style={{ textAlign: "center" }}>
+          <a href="https://fynovo.in/" className="btn-solid" style={{ textAlign: "center" }}>
             Get started free →
           </a>
         </div>
@@ -1226,7 +1226,7 @@ export default function App() {
         </p>
 
         <div className="hero-ctas">
-          <a href="#" className="btn-solid btn-xl">Start for free</a>
+          <a href="https://fynovo.in/" className="btn-solid btn-xl">Start for free</a>
           <a href="#fyn-ai" className="btn-ghost btn-xl">Meet Fyn AI ↓</a>
         </div>
         <p className="hero-note">// no credit card · setup in 90s · cancel anytime</p>
@@ -1246,9 +1246,9 @@ export default function App() {
               {/* KPI Row */}
               <div className="krow">
                 {[
-                  { l:"Total Income",   v:"₹48,290", b:"↑ 12.4%", u:true,  cls:"a", s:[40,55,45,70,60,80,65,90], c:"#00d4ff" },
-                  { l:"Total Expenses", v:"₹29,114", b:"↓ 3.1%",  u:false, cls:"r", s:[80,70,75,65,70,60,65,55], c:"#ff7aaa" },
-                  { l:"Net Profit",     v:"₹19,176", b:"↑ 8.7%",  u:true,  cls:"m", s:[30,40,35,55,48,65,60,78], c:"#4facfe" },
+                  { l: "Total Income", v: "₹48,290", b: "↑ 12.4%", u: true, cls: "a", s: [40, 55, 45, 70, 60, 80, 65, 90], c: "#00d4ff" },
+                  { l: "Total Expenses", v: "₹29,114", b: "↓ 3.1%", u: false, cls: "r", s: [80, 70, 75, 65, 70, 60, 65, 55], c: "#ff7aaa" },
+                  { l: "Net Profit", v: "₹19,176", b: "↑ 8.7%", u: true, cls: "m", s: [30, 40, 35, 55, 48, 65, 60, 78], c: "#4facfe" },
                 ].map((k) => (
                   <div className="kpi" key={k.l}>
                     <div className="ktop">
@@ -1259,7 +1259,7 @@ export default function App() {
                     <div className="spark">
                       {k.s.map((h, i) => (
                         <div key={i} className="sp"
-                          style={{ height:`${h}%`, background: k.c, opacity: i === k.s.length - 1 ? 1 : 0.15 + i * 0.1 }}
+                          style={{ height: `${h}%`, background: k.c, opacity: i === k.s.length - 1 ? 1 : 0.15 + i * 0.1 }}
                         />
                       ))}
                     </div>
@@ -1286,8 +1286,8 @@ export default function App() {
                             background: hovBar === i
                               ? "#00f5c4"
                               : i === 11
-                              ? "var(--aqua)"
-                              : `rgba(0,180,255,${0.15 + h/350})`,
+                                ? "var(--aqua)"
+                                : `rgba(0,180,255,${0.15 + h / 350})`,
                             boxShadow: (hovBar === i || i === 11) ? `0 0 12px rgba(0,212,255,.5)` : "none",
                             transitionDelay: `${i * 0.04}s`,
                             transition: "height .9s cubic-bezier(.16,1,.3,1), background .25s, box-shadow .25s",
@@ -1311,10 +1311,10 @@ export default function App() {
                   <div className="dcc">
                     <svg className="dsvg" width="96" height="96" viewBox="0 0 96 96">
                       {[
-                        { p:40, c:"#00d4ff", o:0  },
-                        { p:30, c:"#4facfe", o:40 },
-                        { p:20, c:"#00f5c4", o:70 },
-                        { p:10, c:"#7b9ff9", o:90 },
+                        { p: 40, c: "#00d4ff", o: 0 },
+                        { p: 30, c: "#4facfe", o: 40 },
+                        { p: 20, c: "#00f5c4", o: 70 },
+                        { p: 10, c: "#7b9ff9", o: 90 },
                       ].map((s, i) => {
                         const r = 34, cx = 48, ci = 2 * Math.PI * r;
                         const d = (s.p / 100) * ci, g = ci - d;
@@ -1332,10 +1332,10 @@ export default function App() {
                     </svg>
                     <div className="dleg">
                       {[
-                        ["#00d4ff","Operations","40%"],
-                        ["#4facfe","Marketing","30%"],
-                        ["#00f5c4","Payroll","20%"],
-                        ["#7b9ff9","Other","10%"],
+                        ["#00d4ff", "Operations", "40%"],
+                        ["#4facfe", "Marketing", "30%"],
+                        ["#00f5c4", "Payroll", "20%"],
+                        ["#7b9ff9", "Other", "10%"],
                       ].map(([c, n, p]) => (
                         <div className="dl" key={n}>
                           <div className="dld" style={{ background: c }} />
@@ -1470,15 +1470,15 @@ export default function App() {
               {activeAI === 0 && (
                 <>
                   <div className="ai-bar-chart">
-                    {[55,42,70,38,85,60,78,45,92,67,80,100].map((h, i) => (
+                    {[55, 42, 70, 38, 85, 60, 78, 45, 92, 67, 80, 100].map((h, i) => (
                       <div key={i} className="ai-bar"
                         style={{
                           height: `${h}%`,
                           background: h > 70
                             ? `linear-gradient(180deg, var(--aqua) 0%, rgba(0,180,255,.5) 100%)`
                             : h > 50
-                            ? `rgba(0,180,255,.3)`
-                            : `rgba(255,120,160,.35)`,
+                              ? `rgba(0,180,255,.3)`
+                              : `rgba(255,120,160,.35)`,
                           boxShadow: h > 70 ? "0 0 10px rgba(0,212,255,.3)" : "none",
                         }}
                       />
@@ -1490,10 +1490,10 @@ export default function App() {
                   </div>
                   <div className="ai-metrics">
                     {[
-                      { v:"+₹14,320", l:"Net P&L",       c:"var(--aqua3)" },
-                      { v:"68%",      l:"Win Rate",       c:"var(--aqua)"  },
-                      { v:"−4.2%",    l:"Max Drawdown",   c:"#ff7aaa"      },
-                      { v:"1.84",     l:"Sharpe Ratio",   c:"var(--blue)"  },
+                      { v: "+₹14,320", l: "Net P&L", c: "var(--aqua3)" },
+                      { v: "68%", l: "Win Rate", c: "var(--aqua)" },
+                      { v: "−4.2%", l: "Max Drawdown", c: "#ff7aaa" },
+                      { v: "1.84", l: "Sharpe Ratio", c: "var(--blue)" },
                     ].map((m) => (
                       <div className="ai-metric" key={m.l}>
                         <div className="ai-metric-val" style={{ color: m.c }}>{m.v}</div>
@@ -1509,13 +1509,13 @@ export default function App() {
                 <>
                   <div className="ai-bar-chart">
                     {[
-                      { h:80,  lbl:"Adobe"     },
-                      { h:100, lbl:"LinkedIn"  },
-                      { h:38,  lbl:"Hotstar"   },
-                      { h:25,  lbl:"Audible"   },
-                      { h:60,  lbl:"Notion"    },
-                      { h:45,  lbl:"Figma"     },
-                      { h:30,  lbl:"Grammarly" },
+                      { h: 80, lbl: "Adobe" },
+                      { h: 100, lbl: "LinkedIn" },
+                      { h: 38, lbl: "Hotstar" },
+                      { h: 25, lbl: "Audible" },
+                      { h: 60, lbl: "Notion" },
+                      { h: 45, lbl: "Figma" },
+                      { h: 30, lbl: "Grammarly" },
                     ].map((b, i) => (
                       <div key={i} className="bw">
                         <div className="ai-bar"
@@ -1537,10 +1537,10 @@ export default function App() {
                   </div>
                   <div className="ai-metrics">
                     {[
-                      { v:"₹1,896",  l:"Monthly Waste",   c:"var(--aqua3)" },
-                      { v:"₹22,752", l:"Yearly Savings",  c:"var(--aqua3)" },
-                      { v:"4",       l:"Dead Subs",        c:"var(--aqua)"  },
-                      { v:"31%",     l:"Above Avg Spend",  c:"#ff7aaa"      },
+                      { v: "₹1,896", l: "Monthly Waste", c: "var(--aqua3)" },
+                      { v: "₹22,752", l: "Yearly Savings", c: "var(--aqua3)" },
+                      { v: "4", l: "Dead Subs", c: "var(--aqua)" },
+                      { v: "31%", l: "Above Avg Spend", c: "#ff7aaa" },
                     ].map((m) => (
                       <div className="ai-metric" key={m.l}>
                         <div className="ai-metric-val" style={{ color: m.c }}>{m.v}</div>
@@ -1555,13 +1555,13 @@ export default function App() {
               {activeAI === 2 && (
                 <>
                   <div className="ai-bar-chart">
-                    {[42,48,44,55,52,62,58,68,65,72,70,80].map((h, i) => (
+                    {[42, 48, 44, 55, 52, 62, 58, 68, 65, 72, 70, 80].map((h, i) => (
                       <div key={i} className="ai-bar"
                         style={{
                           height: `${h}%`,
                           background: `linear-gradient(180deg,
-                            rgba(0,212,255,${0.3 + (i/11)*0.7}) 0%,
-                            rgba(0,150,220,${0.2 + (i/11)*0.5}) 100%)`,
+                            rgba(0,212,255,${0.3 + (i / 11) * 0.7}) 0%,
+                            rgba(0,150,220,${0.2 + (i / 11) * 0.5}) 100%)`,
                           boxShadow: i > 8 ? "0 0 8px rgba(0,212,255,.25)" : "none",
                         }}
                       />
@@ -1573,10 +1573,10 @@ export default function App() {
                   </div>
                   <div className="ai-metrics">
                     {[
-                      { v:"₹19,176", l:"Net Profit",      c:"var(--aqua)"  },
-                      { v:"82/100",  l:"Health Score",     c:"var(--aqua3)" },
-                      { v:"+14.8%",  l:"YoY Growth",       c:"var(--aqua)"  },
-                      { v:"6.2x",    l:"Emergency Cover",  c:"var(--blue)"  },
+                      { v: "₹19,176", l: "Net Profit", c: "var(--aqua)" },
+                      { v: "82/100", l: "Health Score", c: "var(--aqua3)" },
+                      { v: "+14.8%", l: "YoY Growth", c: "var(--aqua)" },
+                      { v: "6.2x", l: "Emergency Cover", c: "var(--blue)" },
                     ].map((m) => (
                       <div className="ai-metric" key={m.l}>
                         <div className="ai-metric-val" style={{ color: m.c }}>{m.v}</div>
@@ -1624,7 +1624,7 @@ export default function App() {
           <p className="sec-p">Every plan includes a 30-day free trial. No credit card, no commitment. Fyn AI is included in all plans.</p>
           <div className="ptog">
             <button className={`ptb ${billing === "monthly" ? "on" : ""}`} onClick={() => setBilling("monthly")}>Monthly</button>
-            <button className={`ptb ${billing === "annual"  ? "on" : ""}`} onClick={() => setBilling("annual")}>
+            <button className={`ptb ${billing === "annual" ? "on" : ""}`} onClick={() => setBilling("annual")}>
               Annual<span className="save-chip">−20%</span>
             </button>
           </div>
@@ -1649,7 +1649,7 @@ export default function App() {
                     <li key={f}><span className="pchk">✓</span>{f}</li>
                   ))}
                 </ul>
-                <button className="pbtn">{p.cta}</button>
+                <a href="https://fynovo.in/" className="pbtn" style={{ textDecoration: 'none', display: 'block', textAlign: 'center' }}>{p.cta}</a>
               </div>
             );
           })}
@@ -1696,7 +1696,7 @@ export default function App() {
           <h2>Stop guessing.<br />Start knowing.</h2>
           <p>Join 40,000+ users who made the switch to financial clarity. Set up in 90 seconds, Fyn AI included.</p>
           <div className="cta-btns">
-            <button className="cbtn">Start free — no card needed</button>
+            <a href="https://fynovo.in/" className="cbtn" style={{ textDecoration: 'none' }}>Start free — no card needed</a>
             <button className="cbtng">Schedule a demo</button>
           </div>
         </div>
@@ -1711,13 +1711,13 @@ export default function App() {
             <div className="fbrand">Fynovo</div>
             <p className="ftagline">Smart financial management for individuals and teams who think in numbers.</p>
             <div className="fsoc">
-              {["𝕏","in","▶","◎"].map((s, i) => <a key={i} href="#" className="fsb">{s}</a>)}
+              {["𝕏", "in", "▶", "◎"].map((s, i) => <a key={i} href="#" className="fsb">{s}</a>)}
             </div>
           </div>
           {[
-            { title:"Product", links:["Features","Fyn AI","Pricing","Changelog","Roadmap"] },
-            { title:"Company", links:["About","Blog","Careers","Press"] },
-            { title:"Legal",   links:["Privacy","Terms","Security","Contact"] },
+            { title: "Product", links: ["Features", "Fyn AI", "Pricing", "Changelog", "Roadmap"] },
+            { title: "Company", links: ["About", "Blog", "Careers", "Press"] },
+            { title: "Legal", links: ["Privacy", "Terms", "Security", "Contact"] },
           ].map((col) => (
             <div key={col.title}>
               <div className="fct">{col.title}</div>
