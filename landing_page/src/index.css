@@ -7,13 +7,15 @@
 
 html {
   scroll-behavior: smooth;
+  text-size-adjust: 100%; /* covers all modern browsers */
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   min-height: 100vh;
-  background: #030d1a;   /* --navy: deep blue base */
-  color: #e8f4ff;
+  /* soft sky‑blue gradient; replicate the App styles to avoid flash of dark theme */
+  background: linear-gradient(180deg, #F0FAFF 0%, #E0F2FF 100%);
+  color: #0F172A;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

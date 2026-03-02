@@ -92,19 +92,19 @@ const AI_CAPABILITIES = [
 const STEPS = [
   {
     num: "01",
-    emoji: "🔗",
+    img: "/images/step1.png",
     title: "Connect in 90 seconds",
     desc: "Link banks, cards, brokerages, and wallets via read-only OAuth. No credentials stored, ever. Works with 10,000+ institutions.",
   },
   {
     num: "02",
-    emoji: "⚡",
+    img: "/images/step2.png",
     title: "Fyn learns your patterns",
     desc: "The AI maps your financial DNA — spending rhythms, income cycles, recurring obligations, and saving habits — automatically.",
   },
   {
     num: "03",
-    emoji: "🎯",
+    img: "/images/step3.png",
     title: "Act on real clarity",
     desc: "Your dashboard updates in real time. Fyn AI surfaces insights, flags anomalies, and answers questions using only your own data.",
   },
@@ -228,7 +228,9 @@ export default function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [statsOn, setStatsOn] = useState(false);
   const [billing, setBilling] = useState("monthly");
-  const [activeFeat, setActiveFeat] = useState(0);
+  const [activeFeat, _setActiveFeat] = useState(0);
+  const [focusFeat, setFocusFeat] = useState(0); // highlight index
+  const [isSwitching, setIsSwitching] = useState(false);
   const [activeAI, setActiveAI] = useState(0);
   const [hovBar, setHovBar] = useState(null);
   const [chartIn, setChartIn] = useState(false);
@@ -238,6 +240,68 @@ export default function App() {
   const chartRef = useRef(null);
   const statsInView = useInView(statsRef, 0.3);
   const chartInView = useInView(chartRef, 0.3);
+
+  // auto‑rotation helper refs
+  const rotateTimer = useRef(null);
+  const rafRef = useRef(null);
+  const [autoProgress, setAutoProgress] = useState(0);
+
+  // compute reading duration based on description length (words)
+  const computeDuration = (idx) => {
+    const txt = FEATURES[idx].desc || "";
+    const words = txt.trim().split(/\s+/).length;
+    const sec = Math.min(Math.max(words * 0.3, 6), 8);
+    return sec * 1000;
+  };
+
+  // transition to a new feature index with cross‑fade
+  const switchTo = (i) => {
+    if (i === focusFeat) return;
+    // move highlight immediately
+    setFocusFeat(i);
+    setIsSwitching(true);
+    cancelAnimationFrame(rafRef.current);
+    clearTimeout(rotateTimer.current);
+    setAutoProgress(0);
+    setTimeout(() => {
+      _setActiveFeat(i);
+      setIsSwitching(false);
+    }, 350);
+  };
+
+  // start the reading timer and progress animation
+  const startTimer = () => {
+    const dur = computeDuration(activeFeat);
+    const t0 = performance.now();
+    const step = (now) => {
+      const p = Math.min((now - t0) / dur, 1);
+      setAutoProgress(p);
+      if (p < 1) rafRef.current = requestAnimationFrame(step);
+      else rotateNext();
+    };
+    rafRef.current = requestAnimationFrame(step);
+  };
+
+  const rotateNext = () => {
+    switchTo((activeFeat + 1) % FEATURES.length);
+  };
+
+  // restart timer whenever feature index changes or after a switch ends
+  useEffect(() => {
+    if (!isSwitching) {
+      startTimer();
+    }
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      clearTimeout(rotateTimer.current);
+    };
+  }, [activeFeat, isSwitching]);
+
+  const handleFeatClick = (i) => {
+    switchTo(i);
+  };
+
+  useEffect(() => { if (statsInView) setStatsOn(true); }, [statsInView]);
 
   useEffect(() => { if (statsInView) setStatsOn(true); }, [statsInView]);
   useEffect(() => { if (chartInView) setChartIn(true); }, [chartInView]);
@@ -357,7 +421,8 @@ export default function App() {
         html  { scroll-behavior: smooth; }
         body  {
           font-family: 'Inter', sans-serif;
-          background: linear-gradient(180deg, #F8FCFF 0%, #EAF6FF 100%);
+          /* soft sky‑blue gradient for a professional, very light backdrop */
+          background: linear-gradient(180deg, #F0FAFF 0%, #E0F2FF 100%);
           background-attachment: fixed;
           color: var(--txt);
           overflow-x: hidden;
@@ -411,7 +476,7 @@ export default function App() {
         }
         .logo:hover .logo-mark {
           box-shadow: 0 6px 28px rgba(14,165,233,.4);
-          transform: translateY(-1px);
+          transform: translateY(-1px) rotate(-1deg);
         }
         .logo-mark::before {
           content: ''; position: absolute;
@@ -440,6 +505,8 @@ export default function App() {
         }
         .nav-links a:hover { color: var(--txt); }
         .nav-links a:hover::after { transform: scaleX(1); }
+        .nav-links a:active { opacity: 0.7; }
+
 
         .nav-r { display: flex; gap: 10px; align-items: center; }
 
@@ -455,6 +522,7 @@ export default function App() {
         .btn-ghost:hover {
           color: var(--aqua); border-color: var(--aqua);
           background: rgba(14,165,233,.04);
+          transform: translateY(-1px) scale(1.02);
         }
 
         .btn-solid {
@@ -467,10 +535,14 @@ export default function App() {
           box-shadow: 0 4px 18px rgba(14,165,233,.20);
         }
         .btn-solid:hover {
-          transform: translateY(-2px);
+          transform: translateY(-2px) scale(1.02);
+          filter: brightness(1.05);
           box-shadow: 0 8px 28px rgba(14,165,233,.30);
           background: linear-gradient(135deg, #38BDF8 0%, var(--blue) 100%);
         }
+        .btn-solid:active { transform: translateY(0) scale(0.98); }
+        .btn-ghost:active { transform: translateY(0) scale(0.98); }
+
         .btn-xl { font-size: 16px; padding: 16px 44px; }
 
         .mob-btn { display:none; background:none; border:none; cursor:pointer; padding:6px; flex-direction:column; gap:5px; }
@@ -671,7 +743,7 @@ export default function App() {
           background: linear-gradient(90deg, transparent, var(--aqua), transparent);
           opacity: 0; transition: opacity var(--t-med);
         }
-        .kpi:hover { border-color: var(--bdr2); box-shadow: var(--s2); }
+        .kpi:hover { border-color: var(--bdr2); box-shadow: var(--s3); transform: translateY(-2px) scale(1.02); }
         .kpi:hover::before { opacity: .3; }
         .ktop { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
         .klbl { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--muted2); font-family:'JetBrains Mono',monospace; }
@@ -688,8 +760,13 @@ export default function App() {
         .crows { display:grid; grid-template-columns:2fr 1fr; gap:14px; }
         .ccard {
           background: #FFFFFF;
-          border: 1px solid var(--bdr);
+          border: 1px solid transparent;
           border-radius: var(--rl); padding: 22px;
+          transition: transform var(--t-med) var(--ease), box-shadow var(--t-med) var(--ease);
+        }
+        .ccard:hover {
+          box-shadow: var(--s2);
+          transform: translateY(-2px) scale(1.02);
         }
         .chd { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
         .cttl { font-size:14px; font-weight:700; }
@@ -749,7 +826,7 @@ export default function App() {
           background: linear-gradient(90deg, transparent, var(--aqua), transparent);
           transition: width .5s;
         }
-        .sc:hover { background: rgba(14,165,233,.03); }
+        .sc:hover { background: rgba(14,165,233,.03); box-shadow: var(--s2); transform: translateY(-1px) scale(1.01); }
         .sc:hover::before { width: 100%; }
         .sc-ico  { font-size: 30px; display: block; margin-bottom: 16px; }
         .sc-num  {
@@ -786,11 +863,25 @@ export default function App() {
         .feat-list   { display:flex; flex-direction:column; gap:3px; }
         .fi {
           padding: 20px var(--sp-md); border-radius: var(--r);
-          cursor: pointer; transition: all var(--t-med) var(--ease);
+          cursor: pointer;
+          transition: background var(--t-med) var(--ease), box-shadow var(--t-med) var(--ease),
+                      transform var(--t-med) var(--ease), border-color var(--t-med) var(--ease);
           border: 1px solid transparent;
+          opacity: 1 !important; /* ensure always visible */
+          transform: none !important;
         }
-        .fi.on { background: rgba(14,165,233,.06); border-color: var(--bdr2); }
-        .fi:not(.on):hover { background: rgba(14,165,233,.03); }
+        .fi.on {
+          background: rgba(14,165,233,.08);
+          border-color: var(--aqua);
+          box-shadow: var(--s3);
+          transform: translateY(-1px) scale(1.02);
+          z-index: 1;
+        }
+        .fi:not(.on):hover {
+          background: rgba(14,165,233,.04);
+          transform: translateY(-1px) scale(1.02);
+          box-shadow: var(--s1);
+        }
         .fi-row { display:flex; align-items:center; gap:13px; }
         .fi-ico {
           width: 38px; height: 38px; border-radius: 11px;
@@ -799,8 +890,8 @@ export default function App() {
         .fi-meta { display:flex; align-items:center; gap:10px; }
         .fi-tag  { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:2px 8px; border-radius:100px; font-family:'JetBrains Mono',monospace; }
         .fi h3   { font-size:15px; font-weight:700; color: var(--heading); }
-        .fi p    { font-size:13px; color:var(--muted); line-height:1.7; font-weight:400; margin-top:10px; max-height:0; overflow:hidden; transition:max-height .45s ease,opacity var(--t-slow); opacity:0; }
-        .fi.on p { max-height:80px; opacity:1; }
+        .fi p    { font-size:13px; color:var(--muted); line-height:1.7; font-weight:400; margin-top:10px; /* always visible */ }
+        /* descriptions remain visible even when not active */
 
         .feat-preview {
           position: sticky; top: 100px;
@@ -811,8 +902,26 @@ export default function App() {
           display: flex; flex-direction: column;
           align-items: center; justify-content: center;
           text-align: center; overflow: hidden;
-          transition: border-color var(--t-slow);
+          transition: border-color var(--t-slow), box-shadow var(--t-med) var(--ease);
           box-shadow: var(--s2);
+          opacity: 1 !important; /* always visible */
+        }
+        .feat-preview.changing .fp-content {
+          opacity: 0;
+          transform: translateY(12px);
+        } /* reveal classes removed, this still handles inner content only */
+        .fp-content {
+          transition: opacity .4s var(--ease), transform .4s var(--ease);
+        }
+        .feat-preview:hover {
+          transform: translateY(-2px) scale(1.02);
+          box-shadow: var(--s3);
+        }
+        .fp-progress {
+          position: absolute; top: 0; left: 0; height: 3px;
+          background: linear-gradient(90deg, var(--aqua), var(--blue));
+          width: 0%; transition: width 0.1s linear;
+          pointer-events: none;
         }
         .feat-preview::before {
           content: ''; position: absolute; top: 0; left: 0; right: 0;
@@ -956,7 +1065,7 @@ export default function App() {
           pointer-events: none; font-family: 'Inter', sans-serif;
           letter-spacing: -.06em; user-select: none;
         }
-        .step-emoji { font-size: 40px; margin-bottom: 20px; display: block; }
+        .step-img { height: 72px; margin-bottom: 20px; display: block; object-fit: contain; border-radius: 12px; }
         .step-card h3 { font-family:'Inter',sans-serif; font-size:20px; font-weight:700; margin-bottom:12px; color:var(--heading); }
         .step-card p  { font-size:14px; color:var(--muted); line-height:1.75; font-weight:400; }
 
@@ -1158,27 +1267,100 @@ export default function App() {
         .fstatus .pulse-dot { background:var(--aqua3); box-shadow:0 0 8px var(--aqua3); }
 
         /* ── RESPONSIVE ── */
-        @media(max-width:960px){
-          nav{padding:0 20px} .nav-links{display:none} .mob-btn{display:flex}
-          .feat-layout{grid-template-columns:1fr} .feat-preview{display:none}
-          .ai-tabs{flex-direction:column}
-          .ai-tab{border-right:none;border-bottom:1px solid var(--bdr)}
-          .ai-tab:last-child{border-bottom:none}
-          .ai-body{grid-template-columns:1fr;padding:28px}
-          .steps-grid,.pgrid,.tgrid{grid-template-columns:1fr}
-          .stats-grid{grid-template-columns:repeat(2,1fr)}
-          .sc{border-right:1px solid var(--bdr)}
-          .sc:nth-child(even){border-right:none}
-          .sc:nth-child(3),.sc:nth-child(4){border-top:1px solid var(--bdr)}
-          .krow{grid-template-columns:1fr} .crows{grid-template-columns:1fr}
-          .pc.hi{transform:none} .pc.hi:hover{transform:translateY(-5px)}
-          .sec{padding:80px 24px}
-          .how-inner,.testi-inner,.ai-inner{padding:0 24px}
-          .cta-wrap{padding:40px 20px}
-          .cta-box{padding:60px 28px;border-radius:28px}
-          footer{padding:52px 24px 36px}
-          .ftop{grid-template-columns:1fr 1fr}
-          .fbot{flex-direction:column;align-items:flex-start}
+        /* ── RESPONSIVE ── */
+        /* 1. Ultra-wide & Large Desktop (1440px and up) */
+        @media(min-width: 1440px) {
+          .sec { padding: 160px 0; }
+          .hero-h { font-size: 96px; }
+        }
+
+        /* 2. Standard Desktop & Laptops (1024px to 1439px) */
+        @media(max-width: 1439px) {
+          .sec { padding: 120px 40px; }
+          .feat-layout { gap: 40px; }
+        }
+
+        /* 3. Tablets & iPad OS (768px to 1023px) */
+        @media(max-width: 1023px) {
+          nav { padding: 0 32px; }
+          .nav-links { display: none; }
+          .mob-btn { display: flex; }
+          
+          .hero-h { font-size: clamp(40px, 6vw, 64px); }
+          .hero { padding: 120px 24px 60px; }
+          
+          .feat-layout { grid-template-columns: 1fr; }
+          .feat-preview { display: none; }
+          
+          .ai-tabs { flex-direction: column; }
+          .ai-tab { border-right: none; border-bottom: 1px solid var(--bdr); }
+          .ai-tab:last-child { border-bottom: none; }
+          .ai-body { grid-template-columns: 1fr; padding: 40px; }
+          
+          .steps-grid { grid-template-columns: repeat(2, 1fr); }
+          .pgrid { grid-template-columns: repeat(2, 1fr); }
+          .tgrid { grid-template-columns: repeat(2, 1fr); }
+          .stats-grid { grid-template-columns: repeat(2, 1fr); }
+          
+          .sc { border-right: 1px solid var(--bdr); }
+          .sc:nth-child(even) { border-right: none; }
+          .sc:nth-child(3), .sc:nth-child(4) { border-top: 1px solid var(--bdr); }
+          
+          .crows { grid-template-columns: 1fr; }
+          .pc.hi { transform: none; }
+          .pc.hi:hover { transform: translateY(-5px); }
+          
+          .how-inner, .testi-inner, .ai-inner { padding: 0 32px; }
+          .cta-wrap { padding: 60px 32px; }
+          footer { padding: 64px 32px 36px; }
+          .ftop { grid-template-columns: repeat(2, 1fr); gap: 40px; }
+        }
+
+        /* 4. Mobile & Small iOS/Android (Max-width 767px) */
+        @media(max-width: 767px) {
+          nav { padding: 0 20px; }
+          .hero { padding: 100px 20px 40px; }
+          .hero-h { font-size: clamp(36px, 10vw, 48px); }
+          .hero-sub { font-size: 16px; margin-bottom: 32px; }
+          .hero-ctas { flex-direction: column; width: 100%; max-width: 320px; margin: 0 auto; }
+          .btn-xl { padding: 14px 32px; width: 100%; text-align: center; }
+          
+          .sec { padding: 80px 20px; }
+          .how-inner, .testi-inner, .ai-inner { padding: 0 20px; }
+          
+          .steps-grid, .pgrid, .tgrid, .stats-grid { grid-template-columns: 1fr; }
+          .sc { border-right: none; border-top: 1px solid var(--bdr); padding: 40px 20px; }
+          .sc:first-child { border-top: none; }
+          
+          .ai-body { padding: 24px; }
+          .krow { grid-template-columns: 1fr; }
+          
+          .cta-wrap { padding: 40px 20px; }
+          .cta-box { padding: 48px 24px; border-radius: 24px; }
+          .cta-box h2 { font-size: clamp(28px, 8vw, 40px); }
+          .cta-btns { flex-direction: column; width: 100%; }
+          .cbtn, .cbtng { width: 100%; text-align: center; margin-bottom: 8px; }
+          
+          footer { padding: 48px 20px 32px; }
+          .ftop { grid-template-columns: 1fr; gap: 32px; }
+          .fbot { flex-direction: column; align-items: flex-start; gap: 16px; }
+        }
+
+        /* 5. Touch & Accessibility Hardening */
+        @media (hover: none) and (pointer: coarse) {
+          .fi:not(.on):hover { background: transparent; }
+          .step-card:hover { transform: none; box-shadow: none; border-color: var(--bdr); }
+          .pc:hover { transform: none; box-shadow: none; border-color: var(--bdr); }
+          .pc.hi:hover { transform: none; }
+          .tc:hover { transform: none; box-shadow: none; border-color: var(--bdr); }
+        }
+        
+        /* 6. Ultra-small Mobile (iPhone SE bounds - <= 380px) */
+        @media (max-width: 380px) {
+          .kpi { padding: 16px; }
+          .kv { font-size: 24px; }
+          .hero-h { font-size: 32px; }
+          .pamt { font-size: 48px; }
         }
       `}</style>
 
@@ -1403,8 +1585,8 @@ export default function App() {
           <div className="feat-list">
             {FEATURES.map((f, i) => (
               <div key={f.title}
-                className={`fi rv rv-${i % 3 + 1} ${activeFeat === i ? "on" : ""}`}
-                onClick={() => setActiveFeat(i)}>
+                className={`fi ${focusFeat === i ? "on" : ""}`}
+                onClick={() => handleFeatClick(i)}>
                 <div className="fi-row">
                   <div className="fi-ico" style={{ background: `${f.color}14`, color: f.color }}>
                     {f.icon}
@@ -1423,15 +1605,23 @@ export default function App() {
             ))}
           </div>
 
-          <div className="feat-preview rv rv-2"
+          <div
+            className={`feat-preview${isSwitching ? ' changing' : ''}`}
             style={{ borderColor: `${FEATURES[activeFeat].color}30` }}>
-            <div className="fp-ico">{FEATURES[activeFeat].icon}</div>
-            <span className="fp-tag"
-              style={{ background: `${FEATURES[activeFeat].color}14`, color: FEATURES[activeFeat].color }}>
-              {FEATURES[activeFeat].tag}
-            </span>
-            <h4>{FEATURES[activeFeat].title}</h4>
-            <p>{FEATURES[activeFeat].desc}</p>
+            {/* progress indicator */}
+            <div
+              className="fp-progress"
+              style={{ width: `${autoProgress * 100}%` }} />
+
+            <div className="fp-content">
+              <div className="fp-ico">{FEATURES[activeFeat].icon}</div>
+              <span className="fp-tag"
+                style={{ background: `${FEATURES[activeFeat].color}14`, color: FEATURES[activeFeat].color }}>
+                {FEATURES[activeFeat].tag}
+              </span>
+              <h4>{FEATURES[activeFeat].title}</h4>
+              <p>{FEATURES[activeFeat].desc}</p>
+            </div>
           </div>
         </div>
       </section>
@@ -1633,7 +1823,7 @@ export default function App() {
             {STEPS.map((s, i) => (
               <div key={s.num} className={`step-card rv rv-${i + 1}`}>
                 <div className="snbg">{s.num}</div>
-                <span className="step-emoji">{s.emoji}</span>
+                <img src={s.img} alt={s.title} className="step-img" />
                 <h3>{s.title}</h3>
                 <p>{s.desc}</p>
               </div>
