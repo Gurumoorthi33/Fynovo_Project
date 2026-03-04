@@ -1243,7 +1243,11 @@ export default function App() {
         .ftop { max-width:1100px; margin:0 auto 44px; display:grid; grid-template-columns:1.8fr 1fr 1fr 1fr; gap:52px; }
         .fbrand  { font-family:'Inter',sans-serif; font-size:22px; font-weight:700; letter-spacing:-.03em; margin-bottom:14px; }
         .ftagline { font-size:14px; color:var(--muted2); font-weight:400; line-height:1.68; max-width:240px; margin-bottom:24px; }
-        .fsoc { display:flex; gap:10px; }
+        .fsoc { display:flex; gap:10px; align-items:center; }
+        .fsocial-logo { height:32px; width:auto; transition:transform .25s ease, filter .25s ease; }
+        .fsocial-logo:hover { transform:scale(1.1); filter:brightness(1.2); }
+        .fsocial-logo-wrap { padding: 4px; }
+        .fpowered-inline img { height:96px; width:auto; }
         .fsb  {
           width: 36px; height: 36px; border-radius: 10px;
           border: 1px solid var(--bdr2);
@@ -1252,6 +1256,9 @@ export default function App() {
           color: var(--muted); transition: all .25s;
         }
         .fsb:hover { border-color:var(--aqua); color:var(--aqua); background:rgba(14,165,233,.05); transform:translateY(-2px); box-shadow:0 6px 18px rgba(14,165,233,.1); }
+        .fsocial-logo { height:32px; width:auto; transition:transform .25s ease, filter .25s ease; }
+        .fsocial-logo:hover { transform:scale(1.1); filter:brightness(1.2); }
+        .fsocial-logo-wrap { padding: 4px; }
         .fct    { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--muted2); margin-bottom:18px; font-family:'JetBrains Mono',monospace; }
         .flinks { list-style:none; display:flex; flex-direction:column; gap:11px; }
         .flinks a { font-size:14px; color:var(--muted); text-decoration:none; transition:color .22s; font-weight:400; }
@@ -1265,6 +1272,8 @@ export default function App() {
         .fcopy   { font-size:12px; color:var(--muted2); font-family:'JetBrains Mono',monospace; }
         .fstatus { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--aqua3); font-family:'JetBrains Mono',monospace; }
         .fstatus .pulse-dot { background:var(--aqua3); box-shadow:0 0 8px var(--aqua3); }
+
+        
 
         /* ── RESPONSIVE ── */
         /* ── RESPONSIVE ── */
@@ -1920,6 +1929,7 @@ export default function App() {
         </div>
       </div>
 
+
       {/* ══════════════════════════════════════════════════════════
           FOOTER
       ══════════════════════════════════════════════════════════ */}
@@ -1929,13 +1939,27 @@ export default function App() {
             <div className="fbrand">Fynovo</div>
             <p className="ftagline">Smart financial management for individuals and teams who think in numbers.</p>
             <div className="fsoc">
-              {["𝕏", "in", "▶", "◎"].map((s, i) => <a key={i} href="#" className="fsb">{s}</a>)}
+              {[
+                {icon: '𝕏', href: '#'},
+                {icon: 'in', href: 'https://www.linkedin.com/company/tech-vaseegrah/posts/?feedView=all'},
+                {icon: '▶', href: '#'},
+                {icon: '◎', href: '#'}
+              ].map((s, i) => <a key={i} href={s.href} className="fsb" target="_blank" rel="noopener noreferrer">{s.icon}</a>)}
+            </div>
+          </div>
+          {/* powered by column */}
+          <div>
+            <div className="fct">Powered by</div>
+            <div className="fpowered-inline">
+              <a href="https://www.techvaseegrah.com/" target="_blank" rel="noopener noreferrer">
+                <img src="/images/tech_vaseegrah_logo.jpeg" alt="Tech Vaseegrah" />
+              </a>
             </div>
           </div>
           {[
-            { title: "Product", links: ["Features", "Fyn AI", "Pricing", "Changelog", "Roadmap"] },
             { title: "Company", links: ["About", "Blog", "Careers", "Press"] },
             { title: "Legal", links: ["Privacy", "Terms", "Security", "Contact"] },
+            { title: "Product", links: ["Features", "Fyn AI", "Pricing", "Changelog", "Roadmap"] },
           ].map((col) => (
             <div key={col.title}>
               <div className="fct">{col.title}</div>
