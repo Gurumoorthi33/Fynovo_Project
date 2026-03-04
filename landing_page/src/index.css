@@ -31,6 +31,42 @@ img, video, svg {
   max-width: 100%;
 }
 
+/* tech vaseegrah logo enhancements */
+.fpowered-inline .tech-logo-link {
+  position: relative;
+  display: inline-block;
+  padding: 6px;
+}
+
+.fpowered-inline .tech-logo-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(0,123,255,0.15) 0%, transparent 70%);
+  z-index: -1;
+  transition: transform 0.3s ease;
+}
+
+.fpowered-inline .tech-logo-link:hover::before {
+  transform: scale(1.2);
+}
+
+.fpowered-inline .tech-logo {
+  width: 120px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, filter 0.3s ease;
+  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+  padding: 4px;
+}
+
+.fpowered-inline .tech-logo:hover {
+  transform: scale(1.1);
+  filter: brightness(1.1);
+}
+
 button, input, select, textarea {
   font: inherit;
 }

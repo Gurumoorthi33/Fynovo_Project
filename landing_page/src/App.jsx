@@ -1237,17 +1237,52 @@ export default function App() {
         /* ── FOOTER ── */
         footer {
           border-top: 1px solid var(--bdr);
-          padding: 80px 52px 44px;
+          padding: 100px 52px 44px;
           background: #FFFFFF;
+          position: relative;
+          font-size: 14px;
+          color: var(--muted);
         }
-        .ftop { max-width:1100px; margin:0 auto 44px; display:grid; grid-template-columns:1.8fr 1fr 1fr 1fr; gap:52px; }
-        .fbrand  { font-family:'Inter',sans-serif; font-size:22px; font-weight:700; letter-spacing:-.03em; margin-bottom:14px; }
-        .ftagline { font-size:14px; color:var(--muted2); font-weight:400; line-height:1.68; max-width:240px; margin-bottom:24px; }
-        .fsoc { display:flex; gap:10px; align-items:center; }
-        .fsocial-logo { height:32px; width:auto; transition:transform .25s ease, filter .25s ease; }
-        .fsocial-logo:hover { transform:scale(1.1); filter:brightness(1.2); }
-        .fsocial-logo-wrap { padding: 4px; }
-        .fpowered-inline img { height:96px; width:auto; }
+        footer::before {
+          content: "";
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 6px;
+          background: linear-gradient(90deg, var(--aqua) 0%, var(--aqua3) 100%);
+        }
+        .ftop {
+          max-width: 1100px;
+          margin: 0 auto 44px;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 52px;
+        }
+        .ftop > div {
+          flex: 1 1 220px;
+          min-width: 180px;
+        }
+        .fbrand  {
+          font-family: 'Inter', sans-serif;
+          font-size: 24px;
+          font-weight: 700;
+          letter-spacing: -.02em;
+          margin-bottom: 14px;
+        }
+        .ftagline {
+          font-size: 15px;
+          color: var(--muted2);
+          font-weight: 400;
+          line-height: 1.6;
+          max-width: 260px;
+          margin-bottom: 24px;
+        }
+        .fsoc {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+        }
         .fsb  {
           width: 36px; height: 36px; border-radius: 10px;
           border: 1px solid var(--bdr2);
@@ -1256,13 +1291,52 @@ export default function App() {
           color: var(--muted); transition: all .25s;
         }
         .fsb:hover { border-color:var(--aqua); color:var(--aqua); background:rgba(14,165,233,.05); transform:translateY(-2px); box-shadow:0 6px 18px rgba(14,165,233,.1); }
-        .fsocial-logo { height:32px; width:auto; transition:transform .25s ease, filter .25s ease; }
-        .fsocial-logo:hover { transform:scale(1.1); filter:brightness(1.2); }
-        .fsocial-logo-wrap { padding: 4px; }
-        .fct    { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--muted2); margin-bottom:18px; font-family:'JetBrains Mono',monospace; }
-        .flinks { list-style:none; display:flex; flex-direction:column; gap:11px; }
-        .flinks a { font-size:14px; color:var(--muted); text-decoration:none; transition:color .22s; font-weight:400; }
-        .flinks a:hover { color:var(--aqua); }
+        .fct    {
+          font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted2);
+          margin-bottom: 18px; font-family:'JetBrains Mono',monospace;
+        }
+        .flinks {
+          list-style: none;
+          display: flex;
+          flex-direction: column;
+          gap: 11px;
+        }
+        .flinks a {
+          font-size: 14px; color: var(--muted); text-decoration: none;
+          transition: color .22s, text-decoration .22s;
+          font-weight: 400;
+        }
+        .flinks a:hover {
+          color: var(--aqua);
+          text-decoration: underline;
+        }
+        .fpowered-container {
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+        }
+        .fpowered-inline {
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          padding-top:4px;
+        }
+        .fpowered-inline .tech-logo-link {
+          display:inline-block;
+        }
+        .fpowered-inline .tech-logo {
+          width:120px;
+          height:auto;
+          border-radius:12px;
+          box-shadow: 0 4px 10px rgba(0,0,0,.15);
+          transition: transform .3s, filter .3s;
+          background:#fff;
+          padding:4px;
+        }
+        .fpowered-inline .tech-logo:hover {
+          transform:scale(1.05);
+          filter:brightness(1.1);
+        }
         .fbot {
           max-width: 1100px; margin: 0 auto;
           display: flex; align-items: center; justify-content: space-between;
@@ -1271,7 +1345,8 @@ export default function App() {
         }
         .fcopy   { font-size:12px; color:var(--muted2); font-family:'JetBrains Mono',monospace; }
         .fstatus { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--aqua3); font-family:'JetBrains Mono',monospace; }
-        .fstatus .pulse-dot { background:var(--aqua3); box-shadow:0 0 8px var(--aqua3); }
+        .fstatus .pulse-dot { width:8px; height:8px; border-radius:50%; background:var(--aqua3); box-shadow:0 0 8px var(--aqua3); animation:pulse 1.8s infinite }
+        @keyframes pulse {0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
 
         
 
@@ -1322,7 +1397,7 @@ export default function App() {
           .how-inner, .testi-inner, .ai-inner { padding: 0 32px; }
           .cta-wrap { padding: 60px 32px; }
           footer { padding: 64px 32px 36px; }
-          .ftop { grid-template-columns: repeat(2, 1fr); gap: 40px; }
+          .ftop { flex-direction: column; gap: 40px; }
         }
 
         /* 4. Mobile & Small iOS/Android (Max-width 767px) */
@@ -1351,7 +1426,7 @@ export default function App() {
           .cbtn, .cbtng { width: 100%; text-align: center; margin-bottom: 8px; }
           
           footer { padding: 48px 20px 32px; }
-          .ftop { grid-template-columns: 1fr; gap: 32px; }
+          .ftop { flex-direction: column; gap: 32px; }
           .fbot { flex-direction: column; align-items: flex-start; gap: 16px; }
         }
 
@@ -1948,11 +2023,11 @@ export default function App() {
             </div>
           </div>
           {/* powered by column */}
-          <div>
+          <div className="fpowered-container">
             <div className="fct">Powered by</div>
             <div className="fpowered-inline">
-              <a href="https://www.techvaseegrah.com/" target="_blank" rel="noopener noreferrer">
-                <img src="/images/tech_vaseegrah_logo.jpeg" alt="Tech Vaseegrah" />
+              <a href="https://www.techvaseegrah.com/" target="_blank" rel="noopener noreferrer" className="tech-logo-link">
+                <img className="tech-logo" src="/images/tech_vaseegrah_logo.jpeg" alt="Tech Vaseegrah" />
               </a>
             </div>
           </div>
