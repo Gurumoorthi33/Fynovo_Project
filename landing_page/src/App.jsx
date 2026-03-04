@@ -1255,13 +1255,18 @@ export default function App() {
           margin: 0 auto 44px;
           display: flex;
           flex-wrap: wrap;
-          justify-content: space-between;
           align-items: flex-start;
           gap: 52px;
         }
         .ftop > div {
           flex: 1 1 220px;
           min-width: 180px;
+        }
+        /* container for the three link columns; push to right */
+        .fnavcols {
+          display: flex;
+          gap: 52px;
+          margin-left: auto;
         }
         .fbrand  {
           font-family: 'Inter', sans-serif;
@@ -2031,18 +2036,20 @@ export default function App() {
               </a>
             </div>
           </div>
-          {[
-            { title: "Company", links: ["About", "Blog", "Careers", "Press"] },
-            { title: "Legal", links: ["Privacy", "Terms", "Security", "Contact"] },
-            { title: "Product", links: ["Features", "Fyn AI", "Pricing", "Changelog", "Roadmap"] },
-          ].map((col) => (
-            <div key={col.title}>
-              <div className="fct">{col.title}</div>
-              <ul className="flinks">
-                {col.links.map((l) => <li key={l}><a href="#">{l}</a></li>)}
-              </ul>
-            </div>
-          ))}
+          <div className="fnavcols">
+            {[
+              { title: "Company", links: ["About", "Blog", "Careers", "Press"] },
+              { title: "Legal", links: ["Privacy", "Terms", "Security", "Contact"] },
+              { title: "Product", links: ["Features", "Fyn AI", "Pricing", "Changelog", "Roadmap"] },
+            ].map((col) => (
+              <div key={col.title}>
+                <div className="fct">{col.title}</div>
+                <ul className="flinks">
+                  {col.links.map((l) => <li key={l}><a href="#">{l}</a></li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="fbot">
           <div className="fcopy">© 2025 Fynovo, Inc. All rights reserved.</div>
