@@ -1,2063 +1,791 @@
 import { useState, useEffect, useRef } from "react";
 
-/* ═══════════════════════════════════════════════════════════════
-   DATA
-═══════════════════════════════════════════════════════════════ */
-const NAV_LINKS = ["Features", "Fyn AI", "How It Works", "Pricing"];
+/* ============================================================
+   FYNOVO V3 — DARK LUXURY EDITORIAL
+   Direction: Late-night trading terminal × high-fashion editorial
+   Fonts: Playfair Display (editorial serif) × DM Mono (data)
+   Colors: Cream #F0EBE0 · Ink #0D0D0F · Acid #C8F23A · Rust #C94A2A
+   Layout: Asymmetric grid-breaking · NO cards everywhere · 
+           Real editorial proportions · Human-made feel
+   ============================================================ */
 
-const FEATURES = [
-  {
-    icon: "◈",
-    title: "Unified Command Center",
-    desc: "Every transaction across every account — banks, wallets, cards — lands in one living view. Income, expenses, and profit updated the moment they happen.",
-    color: "#00d4ff",
-    tag: "Core",
-  },
-  {
-    icon: "⬡",
-    title: "Trade Intelligence",
-    desc: "Connect your brokerage. Get real-time P&L across all positions, unrealised gains, allocation heatmaps, and win-rate trends updated live.",
-    color: "#4facfe",
-    tag: "Trading",
-  },
-  {
-    icon: "▸",
-    title: "Expense Autopilot",
-    desc: "Rules-based engine that learns your spending patterns. Forgotten subscriptions, bill creep, and impulse categories flagged before they compound.",
-    color: "#00f5c4",
-    tag: "Savings",
-  },
-  {
-    icon: "◉",
-    title: "Cash Flow Forecast",
-    desc: "Monte-Carlo projections on your runway. Know your financial position six months out with confidence intervals grounded in your actual history.",
-    color: "#7b9ff9",
-    tag: "Analytics",
-  },
-  {
-    icon: "⬢",
-    title: "Multi-Entity Books",
-    desc: "Personal, freelance, and business ledgers — isolated but instantly consolidated when you need the full picture across all entities.",
-    color: "#4facfe",
-    tag: "Business",
-  },
-  {
-    icon: "◐",
-    title: "Vault-Level Security",
-    desc: "AES-256 at rest, TLS 1.3 in transit, read-only OAuth bank links. Your credentials never touch Fynovo servers — ever.",
-    color: "#00d4ff",
-    tag: "Security",
-  },
-];
+const G = `
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Sans:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0D0D0F; --ink2:#1A1A1E; --ink3:#252528;
+  --cream:#F0EBE0; --cream2:#D8D2C6; --cream3:#9A9488;
+  --acid:#C8F23A; --rust:#C94A2A; --gold:#D4A843;
+  --b:rgba(240,235,224,.07); --b2:rgba(240,235,224,.13);
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:'Instrument Sans',sans-serif;background:var(--ink);color:var(--cream);overflow-x:hidden;cursor:none;line-height:1.65}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--acid)}
 
-const AI_CAPABILITIES = [
-  {
-    icon: "📈",
-    color: "#4facfe",
-    title: "Trading P&L Analysis",
-    desc: "Fyn AI reads your brokerage data and breaks down profit and loss by position, sector, time horizon, and strategy. It surfaces your win rate, average drawdown, and best-performing instruments — then flags what's quietly dragging returns.",
-    points: [
-      "Position-level P&L breakdown",
-      "Win rate & drawdown tracking",
-      "Sector exposure heatmap",
-      "Underperformer alerts",
-    ],
-  },
-  {
-    icon: "✂️",
-    color: "#00f5c4",
-    title: "Expense Savings Engine",
-    desc: "Fyn AI scans your transaction history to find subscriptions you forgot about, recurring charges that crept up, and spending categories where small changes produce big annual savings — with exact rupee impact.",
-    points: [
-      "Forgotten subscription detector",
-      "Category overspend alerts",
-      "Year-on-year spend comparison",
-      "Personalised saving targets",
-    ],
-  },
-  {
-    icon: "💡",
-    color: "#00d4ff",
-    title: "Profit & Loss Clarity",
-    desc: "Whether you're a freelancer, trader, or business owner — Fyn AI calculates your true net position across all income sources and costs. It separates one-off events from trends so you always know your real financial health.",
-    points: [
-      "Net profit across all entities",
-      "Income source breakdown",
-      "Trend vs. one-off detection",
-      "Month-on-month health score",
-    ],
-  },
-];
+/* CURSOR */
+#c{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--acid);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s,border-radius .2s}
+#cr{position:fixed;top:0;left:0;width:34px;height:34px;border:1px solid rgba(200,242,58,.35);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%)}
+#c.big{width:18px;height:18px;background:var(--rust)}
+#cr.big{width:52px;height:52px;border-color:rgba(201,74,42,.4)}
 
-const STEPS = [
-  {
-    num: "01",
-    img: "/images/step1.png",
-    title: "Connect in 90 seconds",
-    desc: "Link banks, cards, brokerages, and wallets via read-only OAuth. No credentials stored, ever. Works with 10,000+ institutions.",
-  },
-  {
-    num: "02",
-    img: "/images/step2.png",
-    title: "Fyn learns your patterns",
-    desc: "The AI maps your financial DNA — spending rhythms, income cycles, recurring obligations, and saving habits — automatically.",
-  },
-  {
-    num: "03",
-    img: "/images/step3.png",
-    title: "Act on real clarity",
-    desc: "Your dashboard updates in real time. Fyn AI surfaces insights, flags anomalies, and answers questions using only your own data.",
-  },
-];
+/* NOISE */
+body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.55}
 
-const PLANS = [
-  {
-    name: "Solo",
-    price: 9,
-    desc: "For individuals managing personal finances.",
-    features: ["1 seat", "3 linked accounts", "90-day history", "Fyn AI insights", "Basic reports", "Email support"],
-    cta: "Start free — no card",
-    hi: false,
-  },
-  {
-    name: "Pro",
-    price: 29,
-    desc: "For serious investors and freelancers.",
-    features: ["5 seats", "Unlimited accounts", "Full history + exports", "Fyn AI full access", "Trade P&L dashboard", "Forecast engine", "Priority support"],
-    cta: "Start free — no card",
-    hi: true,
-  },
-  {
-    name: "Studio",
-    price: 79,
-    desc: "For teams and multi-entity businesses.",
-    features: ["Unlimited seats", "Multi-entity ledgers", "API + webhooks", "White-label reports", "Custom dashboards", "Dedicated CSM", "SOC 2 & SSO"],
-    cta: "Talk to sales",
-    hi: false,
-  },
-];
+/* TYPE */
+.disp{font-family:'Playfair Display',serif;font-weight:900;line-height:.95;letter-spacing:-.025em}
+.disp-i{font-family:'Playfair Display',serif;font-style:italic;font-weight:400;line-height:1.1}
+.mono{font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
 
-const TESTIMONIALS = [
-  {
-    q: "I stopped bleeding ₹6,000/month in forgotten subscriptions in the first week. Fyn AI found what I never would have caught.",
-    name: "Arjun S.",
-    role: "Full-stack freelancer, Mumbai",
-    avatar: "AS",
-    c: "#00d4ff",
-  },
-  {
-    q: "The trade P&L breakdown replaced three tools I was stitching together. The win-rate tracking is genuinely impressive.",
-    name: "Rachel M.",
-    role: "Retail investor, 6 years",
-    avatar: "RM",
-    c: "#4facfe",
-  },
-  {
-    q: "Fyn AI caught that our SaaS tooling costs had ballooned 40% YoY. That one insight paid for years of subscription.",
-    name: "Deepa N.",
-    role: "COO, Vortex Labs",
-    avatar: "DN",
-    c: "#00f5c4",
-  },
-];
+/* KEYFRAMES */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeL{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeR{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes scIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+@keyframes drawLine{to{stroke-dashoffset:0}}
+@keyframes areaIn{to{opacity:1}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes gradMove{0%{background-position:0% 0%}50%{background-position:100% 100%}100%{background-position:0% 0%}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes scanline{0%{top:-2px}100%{top:100%}}
+@keyframes glitch{0%,91%,100%{transform:none}92%{transform:skewX(1.5deg);clip-path:inset(15% 0 65% 0)}94%{transform:skewX(-1deg);clip-path:inset(65% 0 5% 0)}96%{transform:none;clip-path:none}}
+@keyframes underline{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes acidPulse{0%,100%{box-shadow:0 0 0 0 rgba(200,242,58,0)}50%{box-shadow:0 0 0 10px rgba(200,242,58,0)}}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
 
-/* ═══════════════════════════════════════════════════════════════
-   HOOKS
-═══════════════════════════════════════════════════════════════ */
-function useCounter(target, duration, started, decimals = 0) {
-  const [val, setVal] = useState(0);
+/* REVEAL */
+.r{opacity:0}.r.on{animation:fadeUp .7s cubic-bezier(.16,1,.3,1) both}
+.rl{opacity:0}.rl.on{animation:fadeL .7s cubic-bezier(.16,1,.3,1) both}
+.rr{opacity:0}.rr.on{animation:fadeR .7s cubic-bezier(.16,1,.3,1) both}
+.rs{opacity:0}.rs.on{animation:scIn .65s cubic-bezier(.16,1,.3,1) both}
+.d1{animation-delay:.06s!important}.d2{animation-delay:.13s!important}.d3{animation-delay:.22s!important}
+.d4{animation-delay:.32s!important}.d5{animation-delay:.44s!important}.d6{animation-delay:.58s!important}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 52px;z-index:1000;transition:background .5s,border .4s}
+.nav.s{background:rgba(13,13,15,.86);backdrop-filter:blur(24px);border-bottom:1px solid var(--b)}
+.logo{font-family:'Playfair Display',serif;font-weight:900;font-size:22px;color:var(--cream);text-decoration:none;letter-spacing:-.04em}
+.logo em{font-style:italic;color:var(--acid)}
+.nav-links{display:flex;gap:36px}
+.nav-links a{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--cream3);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--cream)}
+.cta-btn{background:var(--acid);color:var(--ink);border:none;padding:10px 26px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:none;transition:all .2s}
+.cta-btn:hover{background:var(--cream);transform:translateY(-1px)}
+
+/* IMAGE PLACEHOLDER — editorial film frame style */
+.ph{position:relative;overflow:hidden;background:var(--ink2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ph::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--ink2) 0%,#202028 50%,var(--ink2) 100%);background-size:200% 200%;animation:gradMove 5s ease infinite}
+.ph-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px}
+.ph-cross{position:relative;width:32px;height:32px;flex-shrink:0}
+.ph-cross::before,.ph-cross::after{content:'';position:absolute;background:rgba(200,242,58,.25)}
+.ph-cross::before{width:1px;height:100%;left:50%;top:0}
+.ph-cross::after{height:1px;width:100%;top:50%;left:0}
+.ph-txt{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,242,58,.4)}
+.ph-sub{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:rgba(240,235,224,.15);text-align:center}
+/* Corner marks */
+.ph::after{content:'';position:absolute;inset:0;background:
+  linear-gradient(to right,rgba(200,242,58,.18) 1px,transparent 1px) 0 0/12px 12px,
+  linear-gradient(to bottom,rgba(200,242,58,.18) 1px,transparent 1px) 0 0/12px 12px,
+  linear-gradient(to left,rgba(200,242,58,.18) 1px,transparent 1px) 100% 100%/12px 12px,
+  linear-gradient(to top,rgba(200,242,58,.18) 1px,transparent 1px) 100% 100%/12px 12px;
+background-repeat:no-repeat;pointer-events:none;z-index:3}
+.ph-num{position:absolute;top:12px;right:14px;font-family:'DM Mono',monospace;font-size:9px;color:rgba(240,235,224,.18);z-index:4;letter-spacing:.1em}
+.ph-label{position:absolute;bottom:12px;left:14px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:rgba(200,242,58,.4);z-index:4}
+
+/* CHIP */
+.chip{display:inline-flex;flex-direction:column;padding:12px 16px;border:1px solid var(--b2);background:var(--ink2);gap:4px}
+.chip-v{font-family:'DM Mono',monospace;font-weight:500;font-size:20px;color:var(--cream)}
+.chip-l{font-size:10px;color:var(--cream3);letter-spacing:.06em}
+.chip-d{font-family:'DM Mono',monospace;font-size:10px;color:var(--acid)}
+
+/* TAG */
+.tag{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(200,242,58,.28);padding:5px 12px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--acid)}
+.tag::before{content:'';width:4px;height:4px;background:var(--acid);border-radius:50%;animation:acidPulse 2.5s ease-in-out infinite}
+
+/* FEATURE ROW */
+.feat-row{display:grid;grid-template-columns:52px 1fr 24px;gap:24px;padding:28px 0;border-bottom:1px solid var(--b);cursor:default;transition:padding-left .25s}
+.feat-row:hover{padding-left:8px}
+.feat-row:hover .fn{color:var(--acid)}
+.feat-row:hover .ft{color:var(--acid)}
+.feat-row:hover .fa{opacity:1;transform:translateX(0)}
+.fn{font-family:'DM Mono',monospace;font-size:10px;color:rgba(240,235,224,.25);padding-top:4px;transition:color .2s}
+.ft{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;margin-bottom:8px;transition:color .25s}
+.fb{font-size:13px;color:var(--cream3);line-height:1.65;max-width:460px}
+.fa{font-size:16px;color:var(--acid);opacity:0;transform:translateX(-10px);transition:all .28s;padding-top:4px}
+
+/* PRICE TABLE */
+.pt{display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;border:1px solid var(--b2)}
+.pc{padding:44px 40px;position:relative;transition:background .3s}
+.pc:hover{background:rgba(240,235,224,.025)}
+.pc.hot{background:linear-gradient(170deg,rgba(200,242,58,.055) 0%,transparent 55%)}
+.pd{background:var(--b2)}
+.pn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream3);margin-bottom:22px}
+.pamt{font-family:'Playfair Display',serif;font-weight:900;font-size:60px;line-height:1;letter-spacing:-.04em;margin-bottom:6px}
+.pamt em{font-size:24px;font-style:normal;color:var(--cream3)}
+.pper{font-family:'DM Mono',monospace;font-size:9px;color:var(--cream3);letter-spacing:.1em;margin-bottom:40px}
+.pf{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--cream2);padding:10px 0;border-bottom:1px solid rgba(240,235,224,.05)}
+.pf::before{content:'—';color:var(--acid);font-family:'DM Mono',monospace;font-size:11px;flex-shrink:0}
+.pbtn{margin-top:40px;width:100%;padding:14px;border:1px solid;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:none;transition:all .25s;background:transparent}
+.pbtn.o{border-color:var(--b2);color:var(--cream3)}.pbtn.o:hover{border-color:var(--cream);color:var(--cream)}
+.pbtn.a{border-color:var(--acid);color:var(--acid)}.pbtn.a:hover{background:var(--acid);color:var(--ink)}
+.pbtn.s{background:var(--cream);border-color:var(--cream);color:var(--ink)}.pbtn.s:hover{background:var(--acid);border-color:var(--acid)}
+
+/* TESTI */
+.tc{padding:40px;border:1px solid var(--b);background:var(--ink2);position:relative;transition:transform .3s,border-color .3s;cursor:default}
+.tc:hover{transform:translateY(-5px);border-color:var(--b2)}
+.tc::before{content:'"';font-family:'Playfair Display',serif;font-size:90px;line-height:1;color:rgba(200,242,58,.08);position:absolute;top:12px;left:28px;pointer-events:none}
+
+/* INTEGRATION ITEM */
+.ii{display:flex;flex-direction:column;align-items:center;gap:14px;padding:28px 20px;border-right:1px solid var(--b);border-bottom:1px solid var(--b);transition:background .25s;cursor:default}
+.ii:hover{background:rgba(200,242,58,.03)}
+.ii:hover .in{color:var(--acid)}
+.in{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--cream3);text-align:center;transition:color .2s}
+
+/* STAT */
+.sn{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(52px,7vw,88px);line-height:1;letter-spacing:-.04em}
+.sn em{color:var(--acid);font-style:normal}
+`;
+
+/* useReveal hook */
+function useReveal(t = 0.1) {
+  const ref = useRef(null);
+  const [on, setOn] = useState(false);
   useEffect(() => {
-    if (!started) return;
-    let t0 = null;
-    const tick = (ts) => {
-      if (!t0) t0 = ts;
-      const p = Math.min((ts - t0) / duration, 1);
-      const e = 1 - Math.pow(2, -10 * p);
-      setVal(parseFloat((e * target).toFixed(decimals)));
-      if (p < 1) requestAnimationFrame(tick);
-      else setVal(target);
+    const el = ref.current; if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setOn(true); obs.disconnect(); } }, { threshold: t });
+    obs.observe(el); return () => obs.disconnect();
+  }, [t]);
+  return [ref, on];
+}
+function R({ c = "r", d = "", children, style = {} }) {
+  const [ref, on] = useReveal();
+  return <div ref={ref} className={`${c} ${d} ${on ? "on" : ""}`} style={style}>{children}</div>;
+}
+
+/* Cursor */
+function Cursor() {
+  const cRef = useRef(null), rRef = useRef(null);
+  const p = useRef({ cx: 0, cy: 0, rx: 0, ry: 0 });
+  useEffect(() => {
+    const mv = e => { p.current.cx = e.clientX; p.current.cy = e.clientY; };
+    document.addEventListener("mousemove", mv);
+    let raf;
+    const loop = () => {
+      p.current.rx += (p.current.cx - p.current.rx) * .09;
+      p.current.ry += (p.current.cy - p.current.ry) * .09;
+      if (cRef.current) cRef.current.style.transform = `translate(${p.current.cx}px,${p.current.cy}px) translate(-50%,-50%)`;
+      if (rRef.current) rRef.current.style.transform = `translate(${p.current.rx}px,${p.current.ry}px) translate(-50%,-50%)`;
+      raf = requestAnimationFrame(loop);
     };
-    requestAnimationFrame(tick);
-  }, [started, target, duration, decimals]);
-  return val;
-}
-
-function useInView(ref, threshold = 0.2) {
-  const [v, setV] = useState(false);
-  useEffect(() => {
-    if (!ref.current) return;
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setV(true); },
-      { threshold }
-    );
-    obs.observe(ref.current);
-    return () => obs.disconnect();
+    raf = requestAnimationFrame(loop);
+    const ov = e => {
+      const isHot = e.target.closest("button,.cta-btn,.pbtn,a");
+      cRef.current?.classList.toggle("big", !!isHot);
+      rRef.current?.classList.toggle("big", !!isHot);
+    };
+    document.addEventListener("mouseover", ov);
+    return () => { document.removeEventListener("mousemove", mv); document.removeEventListener("mouseover", ov); cancelAnimationFrame(raf); };
   }, []);
-  return v;
+  return <><div id="c" ref={cRef}/><div id="cr" ref={rRef}/></>;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   STAT CARD
-═══════════════════════════════════════════════════════════════ */
-function StatCard({ stat, started, i }) {
-  const n = useCounter(stat.end, 1900 + i * 200, started, stat.dec);
-  const fmt = () => {
-    if (stat.fmt === "M+") return `${(n / 1e6).toFixed(1)}M+`;
-    if (stat.fmt === "$M") return `$${Math.round(n)}M`;
-    if (stat.fmt === "K+") return `${Math.round(n / 1000)}K+`;
-    if (stat.fmt === "%") return `${n.toFixed(1)}%`;
-    return n;
-  };
+/* Image Placeholder */
+function Ph({ label = "PHOTO", num = "00", style = {}, children }) {
   return (
-    <div className={`sc rv rv-${i + 1}`}>
-      <span className="sc-ico">{stat.icon}</span>
-      <strong className="sc-num">{fmt()}</strong>
-      <p className="sc-lbl">{stat.label}</p>
-      <div className="sc-bar">
-        <div className="sc-fill" style={{ width: started ? "100%" : "0%", transitionDelay: `${i * 0.18}s` }} />
+    <div className="ph" style={style}>
+      <div className="ph-inner">
+        <div className="ph-cross"/>
+        <div className="ph-txt">{label}</div>
+        {num && <div className="ph-sub">Slot {num}</div>}
+      </div>
+      <div className="ph-num">{num}</div>
+      <div className="ph-label">{label}</div>
+      {children}
+    </div>
+  );
+}
+
+/* Scanline */
+function Scanline() {
+  return (
+    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden", zIndex: 5 }}>
+      <div style={{
+        position: "absolute", left: 0, right: 0, height: "2px",
+        background: "linear-gradient(transparent, rgba(200,242,58,.04), transparent)",
+        animation: "scanline 9s linear infinite"
+      }}/>
+    </div>
+  );
+}
+
+/* Navbar */
+function Nav() {
+  const [s, setS] = useState(false);
+  useEffect(() => { const fn = () => setS(window.scrollY > 40); window.addEventListener("scroll", fn); return () => window.removeEventListener("scroll", fn); }, []);
+  return (
+    <nav className={`nav${s ? " s" : ""}`}>
+      <a href="#" className="logo">Fy<em>novo</em></a>
+      <div className="nav-links">
+        {["Platform", "Pricing", "Integrations", "Journal"].map(l => <a key={l} href="#">{l}</a>)}
+      </div>
+      <button className="cta-btn">Open Account →</button>
+    </nav>
+  );
+}
+
+/* Hero */
+function Hero() {
+  return (
+    <section style={{ minHeight: "100vh", paddingTop: 64, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", background: "var(--ink)" }}>
+      <Scanline/>
+      {/* Editorial BG number */}
+      <div style={{ position: "absolute", right: -30, top: "8%", fontFamily: "'Playfair Display',serif", fontWeight: 900, fontSize: "clamp(160px,19vw,260px)", lineHeight: 1, color: "rgba(240,235,224,.02)", pointerEvents: "none", userSelect: "none", letterSpacing: "-.05em", zIndex: 0 }}>2025</div>
+
+      {/* Top ticker */}
+      <div style={{ borderBottom: "1px solid var(--b)", padding: "11px 0", overflow: "hidden", flexShrink: 0, position: "relative", zIndex: 2 }}>
+        <div style={{ display: "flex", width: "max-content", animation: "marquee 24s linear infinite" }}>
+          {[...Array(3)].flatMap((_, pass) =>
+            ["GST AUTO-CALC", "SHOPIFY SYNC", "LIVE NSE FEED", "TDS TRACKING", "5-YR FORECAST", "AI ADVISOR", "RAZORPAY LINKED", "AUDIT TRAIL", "GROQ LLAMA 3.3", "MULTI-TENANT"].map((t, i) => (
+              <span key={`${pass}-${i}`} style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, letterSpacing: ".22em", color: i % 3 === 0 ? "var(--acid)" : "rgba(240,235,224,.25)", padding: "0 32px", borderRight: "1px solid var(--b)" }}>{t}</span>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Main layout: editorial asymmetric */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1px 500px", flex: 1, position: "relative", zIndex: 2 }}>
+        {/* LEFT — big headline */}
+        <div style={{ padding: "72px 56px 72px 52px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div>
+            <R>
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 40 }}>
+                <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
+                <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Financial Intelligence</span>
+              </div>
+            </R>
+            <R c="r" d="d1">
+              <h1 className="disp" style={{ fontSize: "clamp(54px,7.5vw,100px)", color: "var(--cream)", animation: "glitch 10s ease-in-out infinite" }}>
+                Automates<br/>Your <em className="disp-i" style={{ color: "var(--acid)" }}>Taxes,</em><br/>Assets &amp;<br/>Cashflow.
+              </h1>
+            </R>
+            <R c="r" d="d2" style={{ marginTop: 36 }}>
+              <p style={{ fontSize: 15, color: "var(--cream3)", lineHeight: 1.78, maxWidth: 440 }}>
+                Fynovo is the operating layer for your finances. It connects every rupee across platforms, computes your tax position in real time, and sends you AI-driven moves — before your CA does.
+              </p>
+            </R>
+          </div>
+
+          <div>
+            <R c="r" d="d3">
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 36 }}>
+                {[["₹4.2L","Revenue today","↑18.4%"],["₹3.1L","Net profit","↑24.1%"],["84/100","Tax score","Optimised"]].map(([v,l,d]) => (
+                  <div className="chip" key={l}>
+                    <div className="chip-v">{v}</div>
+                    <div className="chip-l">{l}</div>
+                    <div className="chip-d">{d}</div>
+                  </div>
+                ))}
+              </div>
+            </R>
+            <R c="r" d="d4">
+              <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
+                <button className="cta-btn" style={{ padding: "14px 40px", fontSize: 11 }}>Start Free — ₹0</button>
+                <button style={{ background: "none", border: "none", cursor: "none", color: "var(--cream3)", fontFamily: "'DM Mono',monospace", fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 10, transition: "color .2s" }}
+                  onMouseEnter={e => e.currentTarget.style.color = "var(--cream)"}
+                  onMouseLeave={e => e.currentTarget.style.color = "var(--cream3)"}>
+                  <span style={{ width: 36, height: 36, border: "1px solid var(--b2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>▷</span>
+                  Watch 90s demo
+                </button>
+              </div>
+            </R>
+          </div>
+        </div>
+
+        <div style={{ background: "var(--b)" }}/>
+
+        {/* RIGHT — photo collage */}
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <R c="rs" d="d2" style={{ flex: "0 0 58%", position: "relative" }}>
+            <Ph label="Dashboard · Hero" num="01" style={{ height: "100%", width: "100%" }}>
+              {/* Data overlay */}
+              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "20px 24px", background: "linear-gradient(transparent, rgba(13,13,15,.92))", zIndex: 5, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                <div>
+                  <div className="mono" style={{ fontSize: 8, color: "var(--acid)", marginBottom: 4 }}>Revenue · Q2 2025</div>
+                  <div className="disp" style={{ fontSize: 32, color: "var(--cream)" }}>₹42.8L</div>
+                </div>
+                <svg width="80" height="32" viewBox="0 0 80 32">
+                  <polyline points="0,28 14,20 28,23 42,10 56,14 70,4 80,6" fill="none" stroke="var(--acid)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ strokeDasharray: 180, strokeDashoffset: 180, animation: "drawLine 2s ease .6s forwards" }}/>
+                </svg>
+              </div>
+            </Ph>
+          </R>
+          <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1px 1fr", borderTop: "1px solid var(--b)" }}>
+            <R c="rs" d="d3" style={{ height: "100%" }}>
+              <Ph label="Tax Engine" num="02" style={{ height: "100%", minHeight: 160 }}>
+                <div style={{ position: "absolute", bottom: 14, left: 14, zIndex: 5, fontFamily: "'DM Mono',monospace", fontSize: 8, color: "var(--acid)", lineHeight: 1.7 }}>
+                  GST: ₹1.96L<br/>TDS: ₹84K<br/>Score: 84/100
+                </div>
+              </Ph>
+            </R>
+            <div style={{ background: "var(--b)" }}/>
+            <R c="rs" d="d4" style={{ height: "100%" }}>
+              <Ph label="AI Advisor" num="03" style={{ height: "100%", minHeight: 160 }}>
+                <div style={{ position: "absolute", bottom: 14, left: 14, right: 14, zIndex: 5, fontFamily: "'DM Mono',monospace", fontSize: 8, color: "var(--acid)", lineHeight: 1.7 }}>
+                  &gt; Reallocate ₹18K<br/>&gt; Yield: +₹42K<span style={{ animation: "blink 1s step-end infinite" }}>_</span>
+                </div>
+              </Ph>
+            </R>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom city strip */}
+      <div style={{ borderTop: "1px solid var(--b)", padding: "12px 52px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, position: "relative", zIndex: 2 }}>
+        {["Mumbai","Bangalore","Delhi","Chennai","Hyderabad","Pune"].map(c => (
+          <span key={c} className="mono" style={{ fontSize: 8, color: "rgba(240,235,224,.25)" }}>{c}</span>
+        ))}
+        <span className="mono" style={{ fontSize: 8, color: "var(--acid)" }}>● LIVE</span>
+      </div>
+    </section>
+  );
+}
+
+/* Stats */
+function Stats() {
+  const [ref, on] = useReveal(0.3);
+  const [vals, setVals] = useState([0, 0, 0, 0]);
+  const tgts = [70, 5000, 98, 42];
+  useEffect(() => {
+    if (!on) return;
+    tgts.forEach((t, i) => {
+      let c = 0; const step = t / 55;
+      const id = setInterval(() => { c = Math.min(c + step, t); setVals(p => { const n = [...p]; n[i] = Math.round(c); return n; }); if (c >= t) clearInterval(id); }, 20);
+    });
+  }, [on]);
+  const data = [
+    { pre: "", suf: "%", lbl: "Reduction in\nmanual finance work" },
+    { pre: "", suf: "+", lbl: "Businesses trust\nFynovo daily" },
+    { pre: "", suf: "%", lbl: "Customer\nsatisfaction rate" },
+    { pre: "₹", suf: "Cr", lbl: "Revenue processed\nthis year" },
+  ];
+  return (
+    <div ref={ref} style={{ borderTop: "1px solid var(--b)", borderBottom: "1px solid var(--b)", position: "relative", overflow: "hidden" }}>
+      <Scanline/>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)" }}>
+        {data.map(({ pre, suf, lbl }, i) => (
+          <div key={i} style={{ padding: "64px 52px", borderRight: i < 3 ? "1px solid var(--b)" : "none" }}>
+            <div className="sn">{pre}<em>{vals[i].toLocaleString()}</em>{suf}</div>
+            <div style={{ marginTop: 16, fontFamily: "'DM Mono',monospace", fontSize: 9, color: "var(--cream3)", letterSpacing: ".08em", lineHeight: 1.7, whiteSpace: "pre-line" }}>{lbl}</div>
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   APP
-═══════════════════════════════════════════════════════════════ */
-export default function App() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [statsOn, setStatsOn] = useState(false);
-  const [billing, setBilling] = useState("monthly");
-  const [activeFeat, _setActiveFeat] = useState(0);
-  const [focusFeat, setFocusFeat] = useState(0); // highlight index
-  const [isSwitching, setIsSwitching] = useState(false);
-  const [activeAI, setActiveAI] = useState(0);
-  const [hovBar, setHovBar] = useState(null);
-  const [chartIn, setChartIn] = useState(false);
-  const [cursor, setCursor] = useState({ x: -400, y: -400 });
+/* Features */
+const FEATS = [
+  { n:"01", t:"Smart Financial Dashboard", b:"Real-time P&L, balance sheet, and cashflow unified. Multi-source income from Shopify, banks, and manual entries — always current." },
+  { n:"02", t:"AI Financial Advisor", b:"Powered by Gemini & Groq LLaMA 3.3. Personalised savings tips, investment suggestions, and spending alerts — like a CFO in your pocket." },
+  { n:"03", t:"Automated Tax Engine", b:"GST, TDS, and Income Tax calculated in real-time. Tax Optimization Score surfaces legal savings you'd miss otherwise." },
+  { n:"04", t:"Intelligent Asset Management", b:"Gold, silver, equities, crypto tracked live with 5-year AI projections. Know what your assets will be worth in 2030." },
+  { n:"05", t:"SmartBorrow Strategy", b:"AI modelling of borrowing costs, loan structures, and repayment strategies. Minimise interest, maximise working capital." },
+  { n:"06", t:"Real-Time Notifications", b:"Socket.io-powered alerts for bills, transactions, market swings. The platform watches the numbers so you don't have to." },
+];
 
-  const statsRef = useRef(null);
-  const chartRef = useRef(null);
-  const statsInView = useInView(statsRef, 0.3);
-  const chartInView = useInView(chartRef, 0.3);
+function Features() {
+  return (
+    <section style={{ padding: "120px 52px", maxWidth: 1280, margin: "0 auto" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 88, alignItems: "start" }}>
+        <div>
+          <R c="r">
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
+              <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
+              <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Platform</span>
+            </div>
+          </R>
+          <R c="r" d="d1">
+            <h2 className="disp" style={{ fontSize: "clamp(40px,5vw,68px)", marginBottom: 24 }}>
+              Built for the<br/>way money<br/><em className="disp-i" style={{ color: "var(--acid)" }}>actually</em><br/>moves.
+            </h2>
+          </R>
+          <R c="r" d="d2">
+            <p style={{ fontSize: 14, color: "var(--cream3)", lineHeight: 1.8, maxWidth: 360, marginBottom: 44 }}>
+              Every feature is designed around the real financial pressures on Indian SMEs, freelancers, and digital entrepreneurs.
+            </p>
+          </R>
+          <R c="rs" d="d3">
+            <Ph label="Platform Overview" num="04" style={{ height: 320, width: "100%" }}/>
+          </R>
+          <R c="rs" d="d4" style={{ marginTop: 2 }}>
+            <Ph label="Mobile App View" num="05" style={{ height: 180, width: "100%" }}/>
+          </R>
+        </div>
+        <div>
+          {FEATS.map(({ n, t, b }, i) => (
+            <R key={n} c="r" d={`d${Math.min(i + 1, 6)}`}>
+              <div className="feat-row">
+                <div className="fn">{n}</div>
+                <div><div className="ft">{t}</div><div className="fb">{b}</div></div>
+                <div className="fa">→</div>
+              </div>
+            </R>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-  // auto‑rotation helper refs
-  const rotateTimer = useRef(null);
-  const rafRef = useRef(null);
-  const [autoProgress, setAutoProgress] = useState(0);
+/* Showcase */
+function Showcase() {
+  return (
+    <section style={{ padding: "120px 0 0" }}>
+      <div style={{ padding: "0 52px", maxWidth: 1280, margin: "0 auto 40px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <R c="r">
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+              <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
+              <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Product Screens</span>
+            </div>
+            <h2 className="disp" style={{ fontSize: "clamp(36px,4.5vw,60px)" }}>
+              See it in<br/><em className="disp-i" style={{ color: "var(--cream3)" }}>motion.</em>
+            </h2>
+          </R>
+          <R c="r" d="d2"><div className="tag">27 Screens</div></R>
+        </div>
+      </div>
+      {/* Full-bleed grids */}
+      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "360px 220px", gap: 2, marginBottom: 2 }}>
+        <R c="rs" d="d1" style={{ gridRow: "span 2", height: "100%" }}><Ph label="Full Dashboard · Wide" num="06" style={{ height: "100%", width: "100%" }}/></R>
+        <R c="rs" d="d2"><Ph label="Analytics View" num="07" style={{ height: "100%" }}/></R>
+        <R c="rs" d="d3"><Ph label="Tax Filing Screen" num="08" style={{ height: "100%" }}/></R>
+        <R c="rs" d="d4"><Ph label="Asset Portfolio" num="09" style={{ height: "100%" }}/></R>
+        <R c="rs" d="d5"><Ph label="AI Chat" num="10" style={{ height: "100%" }}/></R>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 2, marginBottom: 2 }}>
+        {[["Invoice View","11"],["Notifications","12"],["Mobile App","13"],["Settings","14"]].map(([l, n]) => (
+          <R key={n} c="rs"><Ph label={l} num={n} style={{ height: 180 }}/></R>
+        ))}
+      </div>
+      <R c="rs"><Ph label="Onboarding Flow · Panorama" num="15" style={{ height: 140, width: "100%" }}/></R>
+    </section>
+  );
+}
 
-  // compute reading duration based on description length (words)
-  const computeDuration = (idx) => {
-    const txt = FEATURES[idx].desc || "";
-    const words = txt.trim().split(/\s+/).length;
-    const sec = Math.min(Math.max(words * 0.3, 6), 8);
-    return sec * 1000;
-  };
+/* Deep Feature Split */
+function DeepFeat({ tag, h1, hItalic, body, checks, imgLabel, imgNum, reverse }) {
+  const text = (
+    <R c={reverse ? "rr" : "rl"}>
+      <div className="tag" style={{ marginBottom: 28 }}>{tag}</div>
+      <h2 className="disp" style={{ fontSize: "clamp(32px,3.5vw,50px)", marginBottom: 24, lineHeight: 1.05 }}>
+        {h1}<br/><em className="disp-i" style={{ color: "var(--acid)" }}>{hItalic}</em>
+      </h2>
+      <p style={{ fontSize: 14, color: "var(--cream3)", lineHeight: 1.8, marginBottom: 36 }}>{body}</p>
+      <div>
+        {checks.map((c, i) => (
+          <div key={i} style={{ display: "flex", gap: 16, padding: "16px 0", borderBottom: "1px solid var(--b)", alignItems: "flex-start" }}>
+            <div style={{ width: 18, height: 18, border: "1px solid var(--acid)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
+              <div style={{ width: 6, height: 6, background: "var(--acid)" }}/>
+            </div>
+            <span style={{ fontSize: 13, color: "var(--cream2)", lineHeight: 1.65 }}>{c}</span>
+          </div>
+        ))}
+      </div>
+    </R>
+  );
+  const img = (
+    <R c={reverse ? "rl" : "rr"}>
+      <Ph label={imgLabel} num={imgNum} style={{ height: 460, width: "100%", marginBottom: 2 }}>
+        <div style={{ position: "absolute", top: 20, left: 20, zIndex: 5 }}>
+          <div className="tag">{tag}</div>
+        </div>
+      </Ph>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+        <Ph label={`${imgLabel} · Detail`} num={`${imgNum}A`} style={{ height: 140 }}/>
+        <Ph label={`${imgLabel} · Mobile`} num={`${imgNum}B`} style={{ height: 140 }}/>
+      </div>
+    </R>
+  );
+  return (
+    <div style={{ padding: "120px 52px", borderTop: "1px solid var(--b)" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "start" }}>
+        {reverse ? <>{img}{text}</> : <>{text}{img}</>}
+      </div>
+    </div>
+  );
+}
 
-  // transition to a new feature index with cross‑fade
-  const switchTo = (i) => {
-    if (i === focusFeat) return;
-    // move highlight immediately
-    setFocusFeat(i);
-    setIsSwitching(true);
-    cancelAnimationFrame(rafRef.current);
-    clearTimeout(rotateTimer.current);
-    setAutoProgress(0);
-    setTimeout(() => {
-      _setActiveFeat(i);
-      setIsSwitching(false);
-    }, 350);
-  };
+/* Pricing */
+function Pricing() {
+  return (
+    <section id="pricing" style={{ padding: "120px 52px", borderTop: "1px solid var(--b)" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 60 }}>
+          <div>
+            <R c="r">
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+                <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
+                <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Pricing</span>
+              </div>
+            </R>
+            <R c="r" d="d1">
+              <h2 className="disp" style={{ fontSize: "clamp(36px,4.5vw,64px)" }}>
+                One price.<br/><em className="disp-i" style={{ color: "var(--acid)" }}>No surprises.</em>
+              </h2>
+            </R>
+          </div>
+          <R c="r" d="d2">
+            <p style={{ fontSize: 13, color: "var(--cream3)", maxWidth: 280, lineHeight: 1.75 }}>
+              Start free, scale when ready. Every plan includes the full security stack.
+            </p>
+          </R>
+        </div>
 
-  // start the reading timer and progress animation
-  const startTimer = () => {
-    const dur = computeDuration(activeFeat);
-    const t0 = performance.now();
-    const step = (now) => {
-      const p = Math.min((now - t0) / dur, 1);
-      setAutoProgress(p);
-      if (p < 1) rafRef.current = requestAnimationFrame(step);
-      else rotateNext();
-    };
-    rafRef.current = requestAnimationFrame(step);
-  };
+        {/* Pricing visual */}
+        <R c="rs" d="d2" style={{ marginBottom: 2 }}>
+          <Ph label="Pricing · Feature Comparison" num="18" style={{ height: 100, width: "100%" }}/>
+        </R>
 
-  const rotateNext = () => {
-    switchTo((activeFeat + 1) % FEATURES.length);
-  };
+        <R c="rs" d="d3">
+          <div className="pt">
+            <div className="pc">
+              <div className="pn">Starter Plan</div>
+              <div className="pamt"><em>₹</em>499</div>
+              <div className="pper">Per month / billed annually</div>
+              {["Single income source","Basic expense tracking","1 GB data storage","Email support"].map(f=><div className="pf" key={f}>{f}</div>)}
+              <button className="pbtn o">Get Started</button>
+            </div>
+            <div className="pd"/>
+            <div className="pc hot">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div className="pn">Professional</div>
+                <div className="tag" style={{ fontSize: 8 }}>Popular</div>
+              </div>
+              <div className="pamt"><em>₹</em>1,499</div>
+              <div className="pper">Per month / billed annually</div>
+              {["Unlimited income sources","AI Financial Advisor","Full Tax Engine (GST/TDS)","5-year asset projections","SmartBorrow strategy"].map(f=><div className="pf" key={f}>{f}</div>)}
+              <button className="pbtn a">Start Free Trial</button>
+            </div>
+            <div className="pd"/>
+            <div className="pc">
+              <div className="pn">Enterprise</div>
+              <div className="pamt" style={{ fontSize: 40 }}>Custom</div>
+              <div className="pper">Contact for quote</div>
+              {["Multi-tenant architecture","Custom API integrations","Dedicated account manager","Advanced audit trails","SLA guarantee"].map(f=><div className="pf" key={f}>{f}</div>)}
+              <button className="pbtn s">Contact Sales</button>
+            </div>
+          </div>
+        </R>
+      </div>
+    </section>
+  );
+}
 
-  // restart timer whenever feature index changes or after a switch ends
-  useEffect(() => {
-    if (!isSwitching) {
-      startTimer();
-    }
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      clearTimeout(rotateTimer.current);
-    };
-  }, [activeFeat, isSwitching]);
+/* Testimonials */
+const TESTIS = [
+  { q:"Fynovo made our quarterly close 4× faster. The AI advisor flagged a ₹2L GST saving we'd have completely missed.", name:"Rahul Krishnan", role:"Founder · D2C Brand, Chennai", init:"RK" },
+  { q:"I connected Shopify on Monday. By Tuesday every order was categorised, GST computed, and I had a P&L.", name:"Priya Sharma", role:"E-commerce Seller · Bangalore", init:"PS" },
+  { q:"The 5-year asset projection is frighteningly accurate. Within 4% of actual.", name:"Arjun Mehta", role:"Angel Investor · Mumbai", init:"AM" },
+  { q:"We cut our CA fees by 60% because Fynovo handles everything our CA used to do manually.", name:"Sneha Iyer", role:"CFO · EdTech Startup, Pune", init:"SI" },
+  { q:"SmartBorrow restructured our working capital and saved ₹8L in interest. ROI in month one.", name:"Vikram Nair", role:"SME Owner · Delhi", init:"VN" },
+  { q:"As a freelancer managing 5 clients, the multi-source income view is the only way I stay sane.", name:"Deepa Rao", role:"Consultant · Hyderabad", init:"DR" },
+];
 
-  const handleFeatClick = (i) => {
-    switchTo(i);
-  };
+function Testimonials() {
+  return (
+    <section style={{ padding: "120px 52px", borderTop: "1px solid var(--b)" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 88, alignItems: "start" }}>
+          <div style={{ position: "sticky", top: 96 }}>
+            <R c="r">
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+                <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
+                <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Customers</span>
+              </div>
+            </R>
+            <R c="r" d="d1">
+              <h2 className="disp" style={{ fontSize: "clamp(32px,3vw,52px)", marginBottom: 20 }}>
+                What they<br/><em className="disp-i" style={{ color: "var(--acid)" }}>said.</em>
+              </h2>
+            </R>
+            <R c="r" d="d2">
+              <p style={{ fontSize: 13, color: "var(--cream3)", lineHeight: 1.75 }}>From solo freelancers to Series A teams.</p>
+            </R>
+            <R c="rs" d="d3" style={{ marginTop: 36 }}><Ph label="Customer Photo" num="19" style={{ height: 200, width: "100%" }}/></R>
+            <R c="rs" d="d4" style={{ marginTop: 2 }}><Ph label="Team Office" num="20" style={{ height: 140, width: "100%" }}/></R>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+            {TESTIS.map(({ q, name, role, init }, i) => (
+              <R key={name} c="r" d={`d${(i % 3) + 1}`}>
+                <div className="tc" style={{ height: "100%" }}>
+                  <p style={{ fontSize: 14, color: "var(--cream2)", lineHeight: 1.78, marginBottom: 28, fontStyle: "italic", fontFamily: "'Playfair Display',serif", position: "relative", zIndex: 1 }}>"{q}"</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, borderTop: "1px solid var(--b)", paddingTop: 20 }}>
+                    <div style={{ width: 34, height: 34, border: "1px solid var(--b2)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Mono',monospace", fontSize: 10, color: "var(--acid)" }}>{init}</div>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 13, color: "var(--cream)" }}>{name}</div>
+                      <div style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, color: "var(--cream3)", letterSpacing: ".05em" }}>{role}</div>
+                    </div>
+                  </div>
+                </div>
+              </R>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
-  useEffect(() => { if (statsInView) setStatsOn(true); }, [statsInView]);
+/* Integrations */
+const INTS = [
+  ["Shopify","21"],["WooCommerce","22"],["Razorpay","23"],["Stripe","24"],
+  ["Google Gemini","25"],["Groq LLaMA","26"],["BSE / NSE","27"],["Google OAuth","28"],
+];
 
-  useEffect(() => { if (statsInView) setStatsOn(true); }, [statsInView]);
-  useEffect(() => { if (chartInView) setChartIn(true); }, [chartInView]);
+function Integrations() {
+  return (
+    <section id="integrations" style={{ padding: "120px 52px", borderTop: "1px solid var(--b)" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 88, alignItems: "start", marginBottom: 60 }}>
+          <div>
+            <R c="r">
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+                <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
+                <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Integrations</span>
+              </div>
+            </R>
+            <R c="r" d="d1">
+              <h2 className="disp" style={{ fontSize: "clamp(32px,3.5vw,52px)", marginBottom: 20 }}>
+                Plugs into<br/><em className="disp-i" style={{ color: "var(--acid)" }}>everything</em><br/>you use.
+              </h2>
+            </R>
+          </div>
+          <R c="r" d="d2" style={{ paddingTop: 20 }}>
+            <p style={{ fontSize: 14, color: "var(--cream3)", lineHeight: 1.8, marginBottom: 28 }}>
+              Connect e-commerce stores, payment gateways, and banking in minutes. Data flows in automatically — you never export a CSV again.
+            </p>
+            <Ph label="Integration Map" num="29" style={{ height: 180, width: "100%" }}/>
+          </R>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", border: "1px solid var(--b)" }}>
+          {INTS.map(([name, n], i) => (
+            <R key={name} c="r" d={`d${(i % 4) + 1}`}>
+              <div className="ii" style={{ borderRight: (i % 4) < 3 ? "1px solid var(--b)" : "none", borderBottom: i < 4 ? "1px solid var(--b)" : "none" }}>
+                <Ph label={name} num={n} style={{ width: 64, height: 64 }}/>
+                <div className="in">{name}</div>
+              </div>
+            </R>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-  useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", fn);
-    return () => window.removeEventListener("scroll", fn);
-  }, []);
+/* CTA */
+function CTA() {
+  return (
+    <section style={{ padding: "140px 52px", borderTop: "1px solid var(--b)", position: "relative", overflow: "hidden", background: "linear-gradient(170deg, var(--ink2) 0%, var(--ink) 60%)" }}>
+      <Scanline/>
+      <div style={{ position: "absolute", bottom: -60, left: -40, fontFamily: "'Playfair Display',serif", fontWeight: 900, fontSize: "clamp(120px,18vw,240px)", lineHeight: 1, color: "rgba(200,242,58,.025)", pointerEvents: "none", userSelect: "none", letterSpacing: "-.05em" }}>FYNOVO</div>
+      <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative", zIndex: 1 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 88, alignItems: "center" }}>
+          <div>
+            <R c="r">
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 32 }}>
+                <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
+                <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Get Started</span>
+              </div>
+            </R>
+            <R c="r" d="d1">
+              <h2 className="disp" style={{ fontSize: "clamp(44px,6.5vw,84px)", marginBottom: 32 }}>
+                Your finances,<br/><em className="disp-i" style={{ color: "var(--acid)" }}>finally</em><br/>under control.
+              </h2>
+            </R>
+            <R c="r" d="d2">
+              <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
+                <button className="cta-btn" style={{ padding: "15px 44px", fontSize: 11 }}>Open Free Account</button>
+                <span className="mono" style={{ fontSize: 9, color: "var(--cream3)" }}>No card required</span>
+              </div>
+            </R>
+          </div>
+          <R c="rs" d="d3">
+            <Ph label="CTA Visual" num="30" style={{ height: 300, width: "100%" }}>
+              <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 28 }}>
+                <div className="tag" style={{ marginBottom: 14, alignSelf: "flex-start" }}>Live platform</div>
+                <div className="mono" style={{ fontSize: 8, color: "var(--cream3)", lineHeight: 1.9 }}>
+                  ₹0 setup · Cancel anytime<br/>GST + TDS + Income Tax<br/>Shopify · Banks · WooCommerce
+                </div>
+              </div>
+            </Ph>
+          </R>
+        </div>
+      </div>
+    </section>
+  );
+}
 
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      (es) => es.forEach((e) => { if (e.isIntersecting) e.target.classList.add("in"); }),
-      { threshold: 0.08, rootMargin: "0px 0px -28px 0px" }
-    );
-    document.querySelectorAll(".rv").forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const fn = (e) => setCursor({ x: e.clientX, y: e.clientY });
-    window.addEventListener("mousemove", fn);
-    return () => window.removeEventListener("mousemove", fn);
-  }, []);
-
-  const STATS = [
-    { icon: "📊", end: 2400000, fmt: "M+", label: "Transactions Tracked", dec: 1 },
-    { icon: "💰", end: 890, fmt: "$M", label: "Revenue Managed", dec: 0 },
-    { icon: "👥", end: 40000, fmt: "K+", label: "Active Users", dec: 0 },
-    { icon: "🔒", end: 99.9, fmt: "%", label: "Uptime SLA", dec: 1 },
+/* Footer */
+function Footer() {
+  const cols = [
+    { h: "Company", links: ["About","Journal","Careers","Press"] },
+    { h: "Product", links: ["Features","Pricing","Integrations","Changelog"] },
+    { h: "Resources", links: ["Documentation","API Docs","Help Centre","Status"] },
+    { h: "Legal", links: ["Privacy Policy","Terms","Cookies","Compliance"] },
   ];
+  return (
+    <footer style={{ borderTop: "1px solid var(--b)", padding: "52px 52px 40px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 0, marginBottom: 52, borderBottom: "1px solid var(--b)", paddingBottom: 52 }}>
+          {cols.map(({ h, links }, i) => (
+            <div key={h} style={{ padding: "0 40px", borderRight: i < 3 ? "1px solid var(--b)" : "none" }}>
+              <div className="mono" style={{ fontSize: 9, color: "var(--cream3)", marginBottom: 20 }}>{h}</div>
+              {links.map(l => (
+                <a key={l} href="#" style={{ display: "block", fontSize: 13, color: "var(--cream3)", textDecoration: "none", marginBottom: 12, transition: "color .2s" }}
+                  onMouseEnter={e => e.currentTarget.style.color = "var(--cream)"}
+                  onMouseLeave={e => e.currentTarget.style.color = "var(--cream3)"}>{l}</a>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <a href="#" className="logo" style={{ fontSize: 20 }}>Fy<em>novo</em></a>
+          <span className="mono" style={{ fontSize: 8, color: "rgba(240,235,224,.25)" }}>© 2025 FYNOVO TECHNOLOGIES PVT. LTD. — ALL RIGHTS RESERVED</span>
+          <div className="tag" style={{ fontSize: 8 }}>Made in India</div>
+        </div>
+      </div>
+    </footer>
+  );
+}
 
-  const bars = [38, 55, 42, 71, 50, 83, 62, 91, 58, 78, 68, 100];
-  const mos = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
-  const cur = AI_CAPABILITIES[activeAI];
-
+/* Root */
+export default function App() {
+  useEffect(() => {
+    if (!document.getElementById("fy-g")) {
+      const s = document.createElement("style");
+      s.id = "fy-g"; s.textContent = G;
+      document.head.appendChild(s);
+    }
+  }, []);
   return (
     <>
-      {/* ══════════════════════════════════════════════════════════
-          STYLES
-      ══════════════════════════════════════════════════════════ */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap');
-
-        *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-
-        :root {
-          /* ── CORE PALETTE — Light SaaS ── */
-          --navy:     #F8FCFF;
-          --navy2:    #EAF6FF;
-          --navy3:    #DBEDF8;
-          --navy4:    #CEE5F4;
-          --panel:    #FFFFFF;
-          --card:     #FFFFFF;
-          --card2:    #FAFCFF;
-
-          /* borders */
-          --bdr:  rgba(15, 23, 42, 0.05);
-          --bdr2: rgba(15, 23, 42, 0.08);
-          --bdr3: rgba(15, 23, 42, 0.14);
-
-          /* ── TYPOGRAPHY HIERARCHY ── */
-          --txt:      #0F172A;   /* page titles — bold, large, dark navy */
-          --heading:  #1E293B;   /* section headings — semi-bold, deep slate */
-          --muted:    #475569;   /* body text — regular weight */
-          --muted2:   #64748B;   /* muted labels */
-          --muted3:   #94A3B8;   /* ultra-muted / placeholder */
-
-          /* ── BRAND ACCENTS ── */
-          --aqua:       #0EA5E9;
-          --aqua2:      #0284C7;
-          --aqua3:      #0D9488;
-          --blue:       #2563EB;
-          --blue2:      #1D4ED8;
-          --indigo:     #6366F1;
-
-          /* ── SEMANTIC STATUS COLORS ── */
-          --success:    #16A34A;
-          --success-bg: rgba(22, 163, 74, 0.08);
-          --danger:     #DC2626;
-          --danger-bg:  rgba(220, 38, 38, 0.08);
-          --warning:    #F59E0B;
-          --warning-bg: rgba(245, 158, 11, 0.08);
-
-          /* glows */
-          --glow-aqua:  rgba(14, 165, 233, 0.08);
-          --glow-blue:  rgba(37, 99, 235, 0.06);
-          --glow-mint:  rgba(13, 148, 136, 0.06);
-
-          /* radii */
-          --r:  16px;
-          --rl: 16px;
-          --rx: 20px;
-          --rxx:24px;
-
-          /* shadows — depth progression */
-          --s1: 0 1px 2px rgba(15,23,42,.03), 0 1px 3px rgba(15,23,42,.05);
-          --s2: 0 4px 12px rgba(15,23,42,.04), 0 1px 3px rgba(15,23,42,.03);
-          --s3: 0 8px 32px rgba(15,23,42,.06), 0 2px 6px rgba(15,23,42,.02);
-          --s4: 0 16px 56px rgba(15,23,42,.08), 0 4px 12px rgba(15,23,42,.03);
-
-          /* spacing */
-          --sp-xs: 8px;
-          --sp-sm: 16px;
-          --sp-md: 24px;
-          --sp-lg: 32px;
-          --sp-xl: 48px;
-          --sp-2xl: 64px;
-
-          /* transitions */
-          --ease: cubic-bezier(.16,1,.3,1);
-          --t-fast: 0.2s;
-          --t-med:  0.25s;
-          --t-slow: 0.3s;
-        }
-
-        html  { scroll-behavior: smooth; }
-        body  {
-          font-family: 'Inter', sans-serif;
-          /* soft sky‑blue gradient for a professional, very light backdrop */
-          background: linear-gradient(180deg, #F0FAFF 0%, #E0F2FF 100%);
-          background-attachment: fixed;
-          color: var(--txt);
-          overflow-x: hidden;
-          -webkit-font-smoothing: antialiased;
-        }
-        ::selection { background: rgba(14,165,233,.15); color: var(--aqua); }
-        ::-webkit-scrollbar       { width: 4px; }
-        ::-webkit-scrollbar-track { background: #E8F2FC; }
-        ::-webkit-scrollbar-thumb { background: #94A3B8; border-radius: 2px; }
-
-        /* ── CURSOR AURORA ── */
-        .cg {
-          position: fixed; pointer-events: none; z-index: 0;
-          width: 600px; height: 600px; border-radius: 50%;
-          background: radial-gradient(circle,
-            rgba(14,165,233,.04) 0%,
-            rgba(37,99,235,.03) 40%,
-            transparent 70%);
-          transform: translate(-50%,-50%);
-          transition: left .12s linear, top .12s linear;
-        }
-
-        /* ── NAV ── */
-        nav {
-          position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-          height: 70px; padding: 0 52px;
-          display: flex; align-items: center; justify-content: space-between;
-          transition: all var(--t-slow) var(--ease);
-          border-bottom: 1px solid transparent;
-        }
-        nav.up {
-          background: rgba(255,255,255,.92);
-          backdrop-filter: blur(32px);
-          -webkit-backdrop-filter: blur(32px);
-          border-color: var(--bdr);
-          box-shadow: var(--s1);
-        }
-
-        .logo {
-          font-size: 22px; font-weight: 800;
-          color: var(--txt); text-decoration: none;
-          display: flex; align-items: center; gap: 11px;
-          letter-spacing: -.03em;
-        }
-        .logo-mark {
-          width: 36px; height: 36px; border-radius: 10px;
-          background: linear-gradient(135deg, var(--aqua) 0%, var(--blue) 100%);
-          display: grid; place-items: center; position: relative;
-          flex-shrink: 0; transition: all .3s;
-          box-shadow: 0 4px 18px rgba(14,165,233,.25);
-        }
-        .logo:hover .logo-mark {
-          box-shadow: 0 6px 28px rgba(14,165,233,.4);
-          transform: translateY(-1px) rotate(-1deg);
-        }
-        .logo-mark::before {
-          content: ''; position: absolute;
-          width: 14px; height: 14px;
-          border: 2.5px solid #FFFFFF; border-radius: 4px;
-        }
-        .logo-mark::after {
-          content: ''; position: absolute;
-          width: 5px; height: 5px;
-          background: #FFFFFF; border-radius: 50%;
-          top: 8px; right: 8px;
-        }
-
-        .nav-links { display: flex; gap: 34px; list-style: none; }
-        .nav-links a {
-          font-size: 14px; font-weight: 500;
-          color: var(--muted2); text-decoration: none;
-          transition: color var(--t-fast); position: relative;
-        }
-        .nav-links a::after {
-          content: ''; position: absolute;
-          bottom: -3px; left: 0; right: 0;
-          height: 1.5px; background: var(--aqua);
-          transform: scaleX(0); transform-origin: left;
-          transition: transform .25s;
-        }
-        .nav-links a:hover { color: var(--txt); }
-        .nav-links a:hover::after { transform: scaleX(1); }
-        .nav-links a:active { opacity: 0.7; }
-
-
-        .nav-r { display: flex; gap: 10px; align-items: center; }
-
-        .btn-ghost {
-          font-family: 'Inter', sans-serif;
-          font-size: 14px; font-weight: 500;
-          color: var(--muted); background: transparent;
-          border: 1px solid var(--bdr2);
-          padding: 10px 24px; border-radius: 100px;
-          cursor: pointer; transition: all var(--t-med) var(--ease);
-          text-decoration: none;
-        }
-        .btn-ghost:hover {
-          color: var(--aqua); border-color: var(--aqua);
-          background: rgba(14,165,233,.04);
-          transform: translateY(-1px) scale(1.02);
-        }
-
-        .btn-solid {
-          font-family: 'Inter', sans-serif;
-          font-size: 14px; font-weight: 700;
-          color: #FFFFFF; background: linear-gradient(135deg, var(--aqua) 0%, var(--blue) 100%);
-          border: none; padding: 10px 26px; border-radius: 100px;
-          cursor: pointer; transition: all var(--t-med) var(--ease);
-          text-decoration: none; display: inline-block;
-          box-shadow: 0 4px 18px rgba(14,165,233,.20);
-        }
-        .btn-solid:hover {
-          transform: translateY(-2px) scale(1.02);
-          filter: brightness(1.05);
-          box-shadow: 0 8px 28px rgba(14,165,233,.30);
-          background: linear-gradient(135deg, #38BDF8 0%, var(--blue) 100%);
-        }
-        .btn-solid:active { transform: translateY(0) scale(0.98); }
-        .btn-ghost:active { transform: translateY(0) scale(0.98); }
-
-        .btn-xl { font-size: 16px; padding: 16px 44px; }
-
-        .mob-btn { display:none; background:none; border:none; cursor:pointer; padding:6px; flex-direction:column; gap:5px; }
-        .mob-btn span { display:block; width:22px; height:2px; background:var(--txt); border-radius:2px; }
-        .mob-nav {
-          position: fixed; top: 70px; left: 0; right: 0;
-          background: rgba(255,255,255,.97); backdrop-filter: blur(28px);
-          padding: 28px 24px; display: flex; flex-direction: column; gap: 20px;
-          z-index: 99; border-top: 1px solid var(--bdr);
-        }
-        .mob-nav a { font-size: 20px; font-weight: 700; color: var(--txt); text-decoration: none; }
-
-        /* ── HERO ── */
-        .hero {
-          min-height: 100vh;
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          text-align: center; padding: 140px 24px 90px;
-          position: relative; overflow: hidden;
-        }
-        .hero-bg { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-
-        /* deep background gradient */
-        .hero-base {
-          position: absolute; inset: 0;
-          background:
-            radial-gradient(ellipse 90% 60% at 50% -10%, rgba(14,165,233,.06) 0%, transparent 65%),
-            radial-gradient(ellipse 60% 40% at 80% 80%,   rgba(37,99,235,.04) 0%, transparent 60%),
-            radial-gradient(ellipse 50% 50% at 15% 70%,   rgba(13,148,136,.03) 0%, transparent 60%),
-            linear-gradient(180deg, #F8FCFF 0%, #EDF7FF 50%, #F8FCFF 100%);
-        }
-
-        /* grid lines */
-        .hero-grid {
-          position: absolute; inset: 0;
-          background-image:
-            linear-gradient(rgba(14,165,233,.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(14,165,233,.03) 1px, transparent 1px);
-          background-size: 60px 60px;
-          mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 20%, transparent 100%);
-        }
-
-        /* horizontal scan line */
-        .scan-line {
-          position: absolute; left: 0; right: 0;
-          height: 1px;
-          background: linear-gradient(90deg, transparent 0%, rgba(14,165,233,.12) 40%, rgba(14,165,233,.12) 60%, transparent 100%);
-          animation: scan 8s linear infinite;
-        }
-        @keyframes scan {
-          0%   { top: -2px; opacity: 0; }
-          5%   { opacity: 1; }
-          95%  { opacity: 1; }
-          100% { top: 100%; opacity: 0; }
-        }
-
-        /* blobs */
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); }
-        .b1 {
-          width: 700px; height: 700px;
-          background: radial-gradient(circle, rgba(14,165,233,.05) 0%, transparent 70%);
-          top: -150px; left: -200px;
-          animation: drift 20s ease-in-out infinite;
-        }
-        .b2 {
-          width: 600px; height: 600px;
-          background: radial-gradient(circle, rgba(37,99,235,.05) 0%, transparent 70%);
-          bottom: -80px; right: -150px;
-          animation: drift 25s ease-in-out infinite reverse;
-        }
-        .b3 {
-          width: 400px; height: 400px;
-          background: radial-gradient(circle, rgba(13,148,136,.04) 0%, transparent 70%);
-          top: 40%; left: 60%;
-          animation: drift 16s ease-in-out infinite 5s;
-        }
-        @keyframes drift {
-          0%,100% { transform: translate(0,0); }
-          33%     { transform: translate(35px,-45px); }
-          66%     { transform: translate(-22px,28px); }
-        }
-
-        /* hero content */
-        .badge {
-          display: inline-flex; align-items: center; gap: 9px;
-          background: rgba(14,165,233,.05);
-          border: 1px solid rgba(14,165,233,.12);
-          padding: 7px 18px; border-radius: 100px;
-          font-size: 13px; font-weight: 600; color: var(--aqua);
-          margin-bottom: 36px; animation: fadeUp .8s ease both;
-          letter-spacing: .01em;
-        }
-        .pulse-dot {
-          width: 7px; height: 7px; border-radius: 50%;
-          background: var(--aqua); flex-shrink: 0;
-          animation: pdot 2s infinite;
-          box-shadow: 0 0 8px rgba(14,165,233,.4);
-        }
-        @keyframes pdot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.6)} }
-
-        h1.hero-h {
-          font-family: 'Inter', sans-serif;
-          font-size: clamp(48px, 7.5vw, 88px);
-          font-weight: 800; line-height: .94;
-          letter-spacing: -.045em;
-          max-width: 920px; margin-bottom: 32px;
-          animation: fadeUp .9s ease .1s both;
-        }
-        .hero-h .line1 { display: block; color: var(--txt); }
-        .hero-h .aqua-grad {
-          display: block;
-          background: linear-gradient(90deg, var(--aqua) 0%, var(--blue) 50%, var(--indigo) 100%);
-          background-size: 200% auto;
-          -webkit-background-clip: text; background-clip: text;
-          -webkit-text-fill-color: transparent;
-          animation: shimmer 4s linear infinite;
-        }
-        @keyframes shimmer { 0%{background-position:0% center} 100%{background-position:200% center} }
-
-        .hero-sub {
-          font-size: clamp(15px, 1.8vw, 18px); font-weight: 400;
-          color: var(--muted); max-width: 540px;
-          line-height: 1.8; margin-bottom: var(--sp-xl);
-          animation: fadeUp 1s ease .2s both;
-        }
-
-        .hero-ctas {
-          display: flex; gap: 14px; flex-wrap: wrap;
-          justify-content: center;
-          animation: fadeUp 1s ease .3s both;
-        }
-
-        .hero-note {
-          margin-top: 20px; font-size: 12px;
-          color: var(--muted2); font-family: 'JetBrains Mono', monospace;
-          letter-spacing: .04em; animation: fadeUp 1s ease .45s both;
-        }
-
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(28px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ── DASHBOARD MOCK ── */
-        .dash-wrap {
-          margin-top: 72px; width: 100%; max-width: 1060px;
-          animation: fadeUp 1.2s ease .6s both; position: relative;
-        }
-        .dash-halo {
-          position: absolute; top: -40px; left: 50%;
-          transform: translateX(-50%);
-          width: 80%; height: 80px;
-          background: radial-gradient(ellipse, rgba(14,165,233,.08) 0%, transparent 70%);
-          filter: blur(24px); pointer-events: none;
-        }
-        .dash-frame {
-          background: #FFFFFF;
-          border: 1px solid var(--bdr2);
-          border-radius: var(--rxx); overflow: hidden;
-          box-shadow: var(--s3);
-        }
-        .dtop {
-          background: #F8FBFF;
-          border-bottom: 1px solid var(--bdr);
-          padding: 14px 26px; display: flex; align-items: center; gap: 12px;
-        }
-        .wdots { display: flex; gap: 7px; }
-        .wd { width: 12px; height: 12px; border-radius: 50%; }
-        .wd:nth-child(1){background:#ff5f57}
-        .wd:nth-child(2){background:#ffbd2e}
-        .wd:nth-child(3){background:#28ca42}
-        .dtitle {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 12px; color: var(--muted2); margin-left: 10px;
-        }
-        .live-tag {
-          margin-left: auto; display: flex; align-items: center; gap: 7px;
-          font-size: 11px; font-weight: 700; color: var(--aqua);
-          font-family: 'JetBrains Mono', monospace; letter-spacing: .06em;
-        }
-        .ldt {
-          width: 6px; height: 6px; background: var(--aqua);
-          border-radius: 50%; animation: pdot 1.5s infinite;
-          box-shadow: 0 0 6px var(--aqua);
-        }
-        .dbody { padding: var(--sp-md); display: flex; flex-direction: column; gap: var(--sp-sm); }
-
-        .krow { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
-        .kpi {
-          background: #FFFFFF;
-          border: 1px solid var(--bdr);
-          border-radius: var(--rl); padding: 22px 24px;
-          cursor: default; transition: all var(--t-med) var(--ease);
-          position: relative; overflow: hidden;
-        }
-        .kpi::before {
-          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-          background: linear-gradient(90deg, transparent, var(--aqua), transparent);
-          opacity: 0; transition: opacity var(--t-med);
-        }
-        .kpi:hover { border-color: var(--bdr2); box-shadow: var(--s3); transform: translateY(-2px) scale(1.02); }
-        .kpi:hover::before { opacity: .3; }
-        .ktop { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
-        .klbl { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--muted2); font-family:'JetBrains Mono',monospace; }
-        .kb   { font-size:10px; font-weight:700; padding:3px 9px; border-radius:100px; font-family:'JetBrains Mono',monospace; }
-        .ku   { background:var(--success-bg); color: var(--success); }
-        .kd   { background:var(--danger-bg); color: var(--danger); }
-        .kv   { font-size:28px; font-weight:800; letter-spacing:-.04em; margin-bottom:14px; font-family:'Inter',sans-serif; }
-        .kv.a { color: var(--aqua); }
-        .kv.m { color: var(--blue); }
-        .kv.r { color: var(--danger); }
-        .spark { display:flex; align-items:flex-end; gap:3px; height:28px; }
-        .sp { flex:1; border-radius:3px 3px 0 0; }
-
-        .crows { display:grid; grid-template-columns:2fr 1fr; gap:14px; }
-        .ccard {
-          background: #FFFFFF;
-          border: 1px solid transparent;
-          border-radius: var(--rl); padding: 22px;
-          transition: transform var(--t-med) var(--ease), box-shadow var(--t-med) var(--ease);
-        }
-        .ccard:hover {
-          box-shadow: var(--s2);
-          transform: translateY(-2px) scale(1.02);
-        }
-        .chd { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
-        .cttl { font-size:14px; font-weight:700; }
-        .csub { font-size:11px; color:var(--muted2); font-family:'JetBrains Mono',monospace; }
-        .yoy  { font-size:11px; color:var(--success); font-weight:700; background:var(--success-bg); padding:4px 11px; border-radius:100px; font-family:'JetBrains Mono',monospace; }
-        .bchart { display:flex; align-items:flex-end; gap:5px; height:92px; }
-        .bw  { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
-        .bar { width:100%; border-radius:4px 4px 0 0; cursor:pointer; min-height:3px; }
-        .bmo { font-size:9px; color:var(--muted2); font-family:'JetBrains Mono',monospace; }
-        .dcc { display:flex; flex-direction:column; align-items:center; gap:12px; }
-        .dsvg { filter:drop-shadow(0 2px 10px rgba(14,165,233,.1)); }
-        .dleg { width:100%; display:flex; flex-direction:column; gap:7px; }
-        .dl  { display:flex; align-items:center; gap:8px; font-size:11px; }
-        .dld { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-        .dln { color:var(--muted); flex:1; }
-        .dlp { font-weight:700; font-family:'JetBrains Mono',monospace; }
-
-        /* ── REVEAL ── */
-        .rv { opacity:0; transform:translateY(32px); transition:opacity .75s cubic-bezier(.16,1,.3,1), transform .75s cubic-bezier(.16,1,.3,1); }
-        .rv.in { opacity:1; transform:translateY(0); }
-        .rv-1{transition-delay:.06s} .rv-2{transition-delay:.13s}
-        .rv-3{transition-delay:.20s} .rv-4{transition-delay:.27s} .rv-5{transition-delay:.34s}
-
-        /* ── STATS STRIP ── */
-        .stats-wrap {
-          position: relative;
-          background: #FFFFFF;
-          border-top: 1px solid var(--bdr);
-          border-bottom: 1px solid var(--bdr);
-          box-shadow: var(--s1);
-        }
-        .stats-wrap::before {
-          content: ''; position: absolute; inset: 0; pointer-events: none;
-          background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(14,165,233,.02) 30%,
-            rgba(37,99,235,.03) 50%,
-            rgba(14,165,233,.02) 70%,
-            transparent 100%);
-        }
-        .stats-grid {
-          max-width: 1100px; margin: 0 auto;
-          display: grid; grid-template-columns: repeat(4,1fr);
-          position: relative;
-        }
-        .sc {
-          padding: 52px var(--sp-lg); text-align: center;
-          cursor: default; position: relative; overflow: hidden;
-          transition: background var(--t-slow);
-          border-right: 1px solid var(--bdr);
-        }
-        .sc:last-child { border-right: none; }
-        .sc::before {
-          content: ''; position: absolute;
-          top: 0; left: 50%; transform: translateX(-50%);
-          width: 0; height: 2px;
-          background: linear-gradient(90deg, transparent, var(--aqua), transparent);
-          transition: width .5s;
-        }
-        .sc:hover { background: rgba(14,165,233,.03); box-shadow: var(--s2); transform: translateY(-1px) scale(1.01); }
-        .sc:hover::before { width: 100%; }
-        .sc-ico  { font-size: 30px; display: block; margin-bottom: 16px; }
-        .sc-num  {
-          font-family: 'Inter', sans-serif;
-          font-size: 52px; font-weight: 700;
-          letter-spacing: -.055em; display: block; min-height: 64px;
-          background: linear-gradient(135deg, #0F172A 20%, var(--aqua) 100%);
-          -webkit-background-clip: text; background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-        .sc-lbl  { font-size: 12px; color: var(--muted2); text-transform: uppercase; letter-spacing: .07em; font-weight: 500; margin-bottom: 24px; font-family:'JetBrains Mono',monospace; }
-        .sc-bar  { height: 1.5px; background: rgba(14,165,233,.1); overflow: hidden; }
-        .sc-fill { height: 100%; background: linear-gradient(90deg, var(--aqua2), var(--aqua), var(--aqua3)); width: 0%; transition: width 2.2s cubic-bezier(.16,1,.3,1); }
-
-        /* ── SECTION BASE ── */
-        .sec { padding: 140px 44px; max-width: 1100px; margin: 0 auto; }
-        .tag-ln {
-          display: inline-flex; align-items: center; gap: 9px;
-          font-size: 11px; font-weight: 700; letter-spacing: .14em;
-          text-transform: uppercase; color: var(--aqua);
-          margin-bottom: 24px; font-family: 'JetBrains Mono', monospace;
-        }
-        .tag-ln::before { content:''; width:20px; height:1.5px; background: linear-gradient(90deg, var(--aqua), var(--blue)); }
-        .sec-h {
-          font-family: 'Inter', sans-serif;
-          font-size: clamp(30px,4.2vw,52px); font-weight: 700;
-          color: var(--heading);
-          letter-spacing: -.04em; line-height: 1.08; margin-bottom: 24px;
-        }
-        .sec-p { font-size: 17px; font-weight: 400; color: var(--muted); max-width: 540px; line-height: 1.78; }
-
-        /* ── FEATURES ── */
-        .feat-layout { display:grid; grid-template-columns:1fr 1.08fr; gap:52px; align-items:start; margin-top:60px; }
-        .feat-list   { display:flex; flex-direction:column; gap:3px; }
-        .fi {
-          padding: 20px var(--sp-md); border-radius: var(--r);
-          cursor: pointer;
-          transition: background var(--t-med) var(--ease), box-shadow var(--t-med) var(--ease),
-                      transform var(--t-med) var(--ease), border-color var(--t-med) var(--ease);
-          border: 1px solid transparent;
-          opacity: 1 !important; /* ensure always visible */
-          transform: none !important;
-        }
-        .fi.on {
-          background: rgba(14,165,233,.08);
-          border-color: var(--aqua);
-          box-shadow: var(--s3);
-          transform: translateY(-1px) scale(1.02);
-          z-index: 1;
-        }
-        .fi:not(.on):hover {
-          background: rgba(14,165,233,.04);
-          transform: translateY(-1px) scale(1.02);
-          box-shadow: var(--s1);
-        }
-        .fi-row { display:flex; align-items:center; gap:13px; }
-        .fi-ico {
-          width: 38px; height: 38px; border-radius: 11px;
-          display: grid; place-items: center; font-size: 16px; flex-shrink: 0;
-        }
-        .fi-meta { display:flex; align-items:center; gap:10px; }
-        .fi-tag  { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:2px 8px; border-radius:100px; font-family:'JetBrains Mono',monospace; }
-        .fi h3   { font-size:15px; font-weight:700; color: var(--heading); }
-        .fi p    { font-size:13px; color:var(--muted); line-height:1.7; font-weight:400; margin-top:10px; /* always visible */ }
-        /* descriptions remain visible even when not active */
-
-        .feat-preview {
-          position: sticky; top: 100px;
-          background: #FFFFFF;
-          border: 1px solid var(--bdr2);
-          border-radius: var(--rxx); padding: 56px var(--sp-xl);
-          min-height: 380px;
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          text-align: center; overflow: hidden;
-          transition: border-color var(--t-slow), box-shadow var(--t-med) var(--ease);
-          box-shadow: var(--s2);
-          opacity: 1 !important; /* always visible */
-        }
-        .feat-preview.changing .fp-content {
-          opacity: 0;
-          transform: translateY(12px);
-        } /* reveal classes removed, this still handles inner content only */
-        .fp-content {
-          transition: opacity .4s var(--ease), transform .4s var(--ease);
-        }
-        .feat-preview:hover {
-          transform: translateY(-2px) scale(1.02);
-          box-shadow: var(--s3);
-        }
-        .fp-progress {
-          position: absolute; top: 0; left: 0; height: 3px;
-          background: linear-gradient(90deg, var(--aqua), var(--blue));
-          width: 0%; transition: width 0.1s linear;
-          pointer-events: none;
-        }
-        .feat-preview::before {
-          content: ''; position: absolute; top: 0; left: 0; right: 0;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, var(--aqua), var(--blue), transparent);
-        }
-        .fp-ico  { font-size: 80px; margin-bottom: 22px; }
-        .fp-tag  { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:4px 13px; border-radius:100px; margin-bottom:18px; display:inline-block; font-family:'JetBrains Mono',monospace; }
-        .feat-preview h4 { font-family:'Inter',sans-serif; font-size:22px; font-weight:700; margin-bottom:14px; color:var(--heading); }
-        .feat-preview p  { font-size:14px; color:var(--muted); line-height:1.75; font-weight:400; max-width:290px; }
-
-        /* ── FYN AI SHOWCASE ── */
-        .ai-section {
-          background: #FFFFFF;
-          border-top: 1px solid var(--bdr);
-          border-bottom: 1px solid var(--bdr);
-          padding: 140px 0;
-          box-shadow: var(--s1);
-        }
-        .ai-inner { max-width:1100px; margin:0 auto; padding:0 44px; }
-
-        .ai-tabs {
-          display: flex; margin-top: 60px;
-          border: 1px solid var(--bdr2);
-          border-radius: var(--rxx); overflow: hidden;
-          background: #F8FBFF;
-        }
-        .ai-tab {
-          flex: 1; padding: var(--sp-md) 26px; cursor: pointer;
-          transition: all var(--t-med) var(--ease); border-right: 1px solid var(--bdr);
-          position: relative;
-        }
-        .ai-tab:last-child { border-right: none; }
-        .ai-tab.on { background: rgba(14,165,233,.06); }
-        .ai-tab:not(.on):hover { background: rgba(14,165,233,.03); }
-        .ai-tab::after {
-          content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-          height: 2px; transform: scaleX(0); transform-origin: left;
-          transition: transform .35s;
-        }
-        .ai-tab.on::after { transform: scaleX(1); }
-        .ai-tab-ico  { font-size: 24px; margin-bottom: 11px; display: block; }
-        .ai-tab-ttl  { font-size: 14px; font-weight: 700; margin-bottom: 5px; color: var(--heading); }
-        .ai-tab-sub  { font-size: 11px; color: var(--muted2); font-weight: 400; line-height: 1.5; font-family:'JetBrains Mono',monospace; }
-
-        .ai-body {
-          display: grid; grid-template-columns: 1fr 1fr; gap: 52px;
-          align-items: center; padding: 52px;
-          background: #FFFFFF;
-          border: 1px solid var(--bdr); border-top: none;
-          border-radius: 0 0 var(--rxx) var(--rxx);
-          box-shadow: var(--s2);
-        }
-        .ai-body-text h3 { font-family:'Inter',sans-serif; font-size:30px; font-weight:700; letter-spacing:-.035em; margin-bottom:20px; line-height:1.1; color:var(--heading); }
-        .ai-body-text p  { font-size:15px; color:var(--muted); font-weight:400; line-height:1.78; margin-bottom:32px; }
-        .ai-points { display:flex; flex-direction:column; gap:12px; }
-        .ai-point  { display:flex; align-items:center; gap:13px; font-size:14px; color:var(--muted); font-weight:400; }
-        .ai-point-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-
-        .ai-visual {
-          background: #F8FBFF;
-          border: 1px solid var(--bdr2);
-          border-radius: var(--rl); padding: 30px;
-          position: relative; overflow: hidden;
-          box-shadow: var(--s1);
-        }
-        .ai-visual::before {
-          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-          background: linear-gradient(90deg, transparent, var(--aqua), transparent);
-        }
-        .ai-visual-glow {
-          position: absolute; top: -60px; right: -60px;
-          width: 220px; height: 220px; border-radius: 50%;
-          filter: blur(60px); opacity: .35; pointer-events: none;
-        }
-        .ai-vis-header { display:flex; align-items:center; gap:11px; margin-bottom:24px; position:relative; }
-        .ai-vis-ico    { width:34px; height:34px; border-radius:10px; display:grid; place-items:center; font-size:15px; flex-shrink:0; }
-        .ai-vis-ttl    { font-size:13px; font-weight:700; }
-        .ai-vis-tag    { font-size:10px; font-family:'JetBrains Mono',monospace; font-weight:700; padding:3px 9px; border-radius:100px; margin-left:auto; letter-spacing:.05em; }
-
-        .ai-bar-chart  { display:flex; align-items:flex-end; gap:6px; height:82px; margin-bottom:18px; position:relative; }
-        .ai-bar        { flex:1; border-radius:4px 4px 0 0; min-height:3px; transition:opacity .2s; cursor:pointer; }
-        .ai-bar:hover  { opacity: .7; }
-
-        .ai-insight-box {
-          background: rgba(14,165,233,.04);
-          border: 1px solid rgba(14,165,233,.12);
-          border-radius: 11px; padding: 13px 15px;
-          display: flex; gap: 11px; align-items: flex-start; margin-top: 4px;
-        }
-        .ai-ins-ico { font-size:15px; flex-shrink:0; margin-top:1px; }
-        .ai-ins-txt { font-size:12px; color: var(--aqua); font-weight:400; line-height:1.65; }
-
-        .ai-metrics { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:14px; }
-        .ai-metric  {
-          background: #FFFFFF;
-          border: 1px solid var(--bdr);
-          border-radius: 11px; padding: 13px 15px;
-          transition: border-color .25s;
-        }
-        .ai-metric:hover { border-color: var(--bdr2); }
-        .ai-metric-val { font-size:20px; font-weight:800; letter-spacing:-.04em; margin-bottom:4px; font-family:'Inter',sans-serif; color:var(--heading); }
-        .ai-metric-lbl { font-size:10px; color:var(--muted2); text-transform:uppercase; letter-spacing:.07em; font-family:'JetBrains Mono',monospace; }
-
-        /* ── HOW IT WORKS ── */
-        .how-section { padding: 140px 0; position: relative; }
-        .how-section::before {
-          content: ''; position: absolute; inset: 0; pointer-events: none;
-          background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(14,165,233,.04) 0%, transparent 70%);
-        }
-        .how-inner { max-width:1100px; margin:0 auto; padding:0 44px; position:relative; }
-        .steps-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:60px; }
-        .step-card {
-          background: #FFFFFF;
-          border: 1px solid var(--bdr);
-          border-radius: var(--rxx); padding: 44px var(--sp-lg);
-          position: relative; overflow: hidden;
-          transition: transform var(--t-slow) var(--ease), border-color var(--t-slow), box-shadow var(--t-slow);
-        }
-        .step-card:hover {
-          transform: translateY(-6px);
-          border-color: var(--bdr3);
-          box-shadow: var(--s3);
-        }
-        .step-card::after {
-          content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
-          background: linear-gradient(90deg, var(--aqua2), var(--aqua), var(--aqua3));
-          transform: scaleX(0); transform-origin: left; transition: transform .4s;
-        }
-        .step-card:hover::after { transform: scaleX(1); }
-        .step-card::before {
-          content: ''; position: absolute; top: -1px; left: 0; right: 0; height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(14,165,233,.15), transparent);
-          opacity: 0; transition: opacity .3s;
-        }
-        .step-card:hover::before { opacity: 1; }
-        .snbg {
-          position: absolute; top: -15px; right: -5px;
-          font-size: 110px; font-weight: 800;
-          color: rgba(14,165,233,.04); line-height: 1;
-          pointer-events: none; font-family: 'Inter', sans-serif;
-          letter-spacing: -.06em; user-select: none;
-        }
-        .step-img { height: 72px; margin-bottom: 20px; display: block; object-fit: contain; border-radius: 12px; }
-        .step-card h3 { font-family:'Inter',sans-serif; font-size:20px; font-weight:700; margin-bottom:12px; color:var(--heading); }
-        .step-card p  { font-size:14px; color:var(--muted); line-height:1.75; font-weight:400; }
-
-        /* connector line between steps */
-        .steps-grid { position: relative; }
-
-        /* ── PRICING ── */
-        .ptog {
-          display: inline-flex;
-          background: #FFFFFF;
-          border: 1px solid var(--bdr2);
-          border-radius: 100px; padding: 4px; margin-top: 24px;
-          box-shadow: var(--s1);
-        }
-        .ptb {
-          padding: 9px 24px; border-radius: 100px; border: none;
-          font-family: 'Inter', sans-serif;
-          font-size: 14px; font-weight: 600;
-          cursor: pointer; transition: all .25s;
-          background: transparent; color: var(--muted);
-        }
-        .ptb.on {
-          background: linear-gradient(135deg, var(--aqua) 0%, var(--blue) 100%);
-          color: #FFFFFF;
-          box-shadow: 0 4px 16px rgba(14,165,233,.22);
-        }
-        .save-chip {
-          margin-left: 8px; font-size: 11px; font-weight: 700;
-          color: var(--aqua3); background: rgba(13,148,136,.08);
-          padding: 2px 9px; border-radius: 100px;
-          font-family: 'JetBrains Mono', monospace;
-        }
-
-        .pgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:48px; align-items:start; }
-        .pc {
-          background: #FFFFFF;
-          border: 1px solid var(--bdr);
-          border-radius: var(--rxx); padding: 40px 36px;
-          transition: transform var(--t-slow) var(--ease), border-color var(--t-slow), box-shadow var(--t-slow);
-          position: relative; overflow: hidden;
-        }
-        .pc::before {
-          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(14,165,233,.15), transparent);
-        }
-        .pc:hover { transform:translateY(-5px); border-color:var(--bdr2); box-shadow:var(--s3); }
-        .pc.hi {
-          background: linear-gradient(160deg, rgba(14,165,233,.04) 0%, rgba(37,99,235,.03) 100%);
-          border-color: var(--aqua2);
-          transform: scale(1.035);
-          box-shadow: 0 12px 48px rgba(14,165,233,.12);
-        }
-        .pc.hi::before { background: linear-gradient(90deg, transparent, var(--aqua), transparent); opacity: 1; }
-        .pc.hi:hover { transform: scale(1.035) translateY(-5px); }
-        .pop-tag {
-          position: absolute; top: 18px; right: 18px;
-          background: linear-gradient(135deg, var(--aqua) 0%, var(--blue) 100%);
-          color: var(--navy); font-size: 10px; font-weight: 800;
-          padding: 4px 12px; border-radius: 100px;
-          text-transform: uppercase; letter-spacing: .06em;
-          font-family: 'JetBrains Mono', monospace;
-        }
-        .pname  { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:var(--muted2); margin-bottom:24px; font-family:'JetBrains Mono',monospace; }
-        .pc.hi .pname { color:var(--aqua); }
-        .pprice { display:flex; align-items:baseline; gap:3px; margin-bottom:8px; }
-        .pcur   { font-size:22px; font-weight:600; color:var(--muted); margin-top:7px; }
-        .pamt   { font-family:'Inter',sans-serif; font-size:56px; font-weight:700; color:var(--txt); letter-spacing:-.05em; }
-        .pc.hi .pamt { color: var(--aqua); }
-        .pper   { font-size:14px; color:var(--muted2); font-weight:400; }
-        .pdesc  { font-size:13px; color:var(--muted2); margin-bottom:var(--sp-md); font-weight:400; }
-        .pdiv   { height:1px; background:var(--bdr); margin:24px 0; }
-        .pc.hi .pdiv { background: rgba(14,165,233,.1); }
-        .pfeats { list-style:none; display:flex; flex-direction:column; gap:12px; margin-bottom:var(--sp-lg); }
-        .pfeats li { font-size:13px; color:var(--muted); display:flex; align-items:center; gap:10px; font-weight:400; }
-        .pchk   { width:18px; height:18px; border-radius:50%; background:rgba(14,165,233,.06); display:grid; place-items:center; flex-shrink:0; font-size:9px; color:var(--aqua); border: 1px solid rgba(14,165,233,.12); }
-        .pc.hi .pchk { background:rgba(14,165,233,.1); color:var(--aqua); border-color:rgba(14,165,233,.2); }
-        .pbtn {
-          width: 100%; padding: 14px; border-radius: 100px;
-          font-family: 'Inter', sans-serif;
-          font-size: 14px; font-weight: 700;
-          cursor: pointer; transition: all var(--t-med) var(--ease);
-          border: 1px solid var(--bdr2);
-          background: transparent; color: var(--heading);
-        }
-        .pbtn:hover { background: linear-gradient(135deg, var(--aqua), var(--blue)); border-color: var(--aqua); color: #FFFFFF; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(14,165,233,.22); }
-        .pc.hi .pbtn { background: linear-gradient(135deg, var(--aqua), var(--blue)); border-color: transparent; color: #FFFFFF; box-shadow: 0 6px 22px rgba(14,165,233,.25); }
-        .pc.hi .pbtn:hover { box-shadow: 0 10px 32px rgba(14,165,233,.35); transform: translateY(-2px); }
-
-        /* ── TESTIMONIALS ── */
-        .testi-section {
-          padding: 140px 0;
-          background: var(--card2);
-          border-top: 1px solid var(--bdr);
-        }
-        .testi-inner { max-width:1100px; margin:0 auto; padding:0 44px; }
-        .tgrid  { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:60px; }
-        .tc {
-          background: #FFFFFF;
-          border: 1px solid var(--bdr);
-          border-radius: var(--rxx); padding: 38px;
-          transition: transform var(--t-slow) var(--ease), border-color var(--t-slow), box-shadow var(--t-slow);
-          position: relative; overflow: hidden;
-        }
-        .tc::before {
-          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(14,165,233,.12), transparent);
-        }
-        .tc:hover { transform:translateY(-6px); border-color:var(--bdr2); box-shadow:var(--s3); }
-        .stars  { display:flex; gap:4px; margin-bottom:18px; }
-        .star   { font-size:14px; color:#ffc837; text-shadow: 0 0 8px rgba(255,200,55,.5); }
-        .tq     { font-size:15px; line-height:1.75; color:var(--muted); font-weight:400; margin-bottom:24px; }
-        .tq::before { content:'"'; font-size:40px; color:var(--aqua); line-height:0; vertical-align:-16px; margin-right:4px; opacity:.3; font-family:'Inter',sans-serif; }
-        .tf     { display:flex; align-items:center; gap:14px; }
-        .tav    { width:44px; height:44px; border-radius:50%; display:grid; place-items:center; font-size:14px; font-weight:800; color:#FFFFFF; flex-shrink:0; box-shadow:0 4px 14px rgba(15,23,42,.1); }
-        .tname  { font-weight:700; font-size:14px; color:var(--heading); }
-        .trole  { font-size:11px; color:var(--muted2); font-family:'JetBrains Mono',monospace; }
-
-        /* ── CTA BANNER ── */
-        .cta-wrap { padding: 100px 44px; }
-        .cta-box {
-          max-width: 1100px; margin: 0 auto;
-          background:
-            radial-gradient(ellipse 80% 100% at 50% -20%, rgba(14,165,233,.05) 0%, transparent 70%),
-            #FFFFFF;
-          border: 1px solid var(--bdr2);
-          border-radius: 40px; padding: 100px var(--sp-2xl);
-          text-align: center; position: relative; overflow: hidden;
-          box-shadow: var(--s3);
-        }
-        .cta-box::before {
-          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-          background: linear-gradient(90deg, transparent 10%, var(--aqua) 50%, transparent 90%);
-        }
-        .cta-box::after {
-          content: ''; position: absolute; bottom: 0; left: 50%;
-          transform: translateX(-50%);
-          width: 60%; height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(14,165,233,.12), transparent);
-        }
-        .cta-box h2 {
-          font-family: 'Inter', sans-serif;
-          font-size: clamp(32px,5vw,60px); font-weight: 800;
-          color: var(--txt);
-          letter-spacing: -.045em; margin-bottom: 24px; position: relative;
-        }
-        .cta-box p { font-size:18px; color:var(--muted); font-weight:400; margin-bottom:var(--sp-xl); max-width:460px; margin-left:auto; margin-right:auto; line-height:1.75; position:relative; }
-        .cta-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; position:relative; }
-        .cbtn  {
-          background: linear-gradient(135deg, var(--aqua) 0%, var(--blue) 100%);
-          color: #FFFFFF; border: none;
-          padding: 18px var(--sp-xl); border-radius: 100px;
-          font-family: 'Inter', sans-serif;
-          font-size: 16px; font-weight: 800;
-          cursor: pointer; transition: all var(--t-slow) var(--ease);
-          box-shadow: 0 6px 24px rgba(14,165,233,.22);
-          letter-spacing: .01em;
-        }
-        .cbtn:hover { transform:translateY(-3px); box-shadow:0 14px 44px rgba(14,165,233,.30); background:linear-gradient(135deg,#38BDF8 0%,var(--blue) 100%); }
-        .cbtng {
-          background: transparent; color: var(--muted);
-          border: 1px solid var(--bdr2);
-          padding: 18px var(--sp-xl); border-radius: 100px;
-          font-family: 'Inter', sans-serif;
-          font-size: 16px; font-weight: 600;
-          cursor: pointer; transition: all var(--t-med) var(--ease);
-        }
-        .cbtng:hover { border-color:var(--aqua); color:var(--aqua); background:rgba(14,165,233,.03); }
-
-        /* ── FOOTER ── */
-        footer {
-          border-top: 1px solid var(--bdr);
-          padding: 100px 52px 44px;
-          background: #FFFFFF;
-          position: relative;
-          font-size: 14px;
-          color: var(--muted);
-        }
-        footer::before {
-          content: "";
-          position: absolute;
-          top: 0; left: 0; right: 0;
-          height: 6px;
-          background: linear-gradient(90deg, var(--aqua) 0%, var(--aqua3) 100%);
-        }
-        .ftop {
-          max-width: 1100px;
-          margin: 0 auto 44px;
-          display: flex;
-          flex-wrap: wrap;
-          align-items: flex-start;
-          gap: 52px;
-        }
-        .ftop > div {
-          flex: 1 1 220px;
-          min-width: 180px;
-        }
-        /* container for the three link columns; push to right */
-        .fnavcols {
-          display: flex;
-          gap: 52px;
-          margin-left: auto;
-        }
-        .fbrand  {
-          font-family: 'Inter', sans-serif;
-          font-size: 24px;
-          font-weight: 700;
-          letter-spacing: -.02em;
-          margin-bottom: 14px;
-        }
-        .ftagline {
-          font-size: 15px;
-          color: var(--muted2);
-          font-weight: 400;
-          line-height: 1.6;
-          max-width: 260px;
-          margin-bottom: 24px;
-        }
-        .fsoc {
-          display: flex;
-          gap: 10px;
-          align-items: center;
-        }
-        .fsb  {
-          width: 36px; height: 36px; border-radius: 10px;
-          border: 1px solid var(--bdr2);
-          display: grid; place-items: center;
-          font-size: 14px; text-decoration: none;
-          color: var(--muted); transition: all .25s;
-        }
-        .fsb:hover { border-color:var(--aqua); color:var(--aqua); background:rgba(14,165,233,.05); transform:translateY(-2px); box-shadow:0 6px 18px rgba(14,165,233,.1); }
-        .fct    {
-          font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted2);
-          margin-bottom: 18px; font-family:'JetBrains Mono',monospace;
-        }
-        .flinks {
-          list-style: none;
-          display: flex;
-          flex-direction: column;
-          gap: 11px;
-        }
-        .flinks a {
-          font-size: 14px; color: var(--muted); text-decoration: none;
-          transition: color .22s, text-decoration .22s;
-          font-weight: 400;
-        }
-        .flinks a:hover {
-          color: var(--aqua);
-          text-decoration: underline;
-        }
-        .fpowered-container {
-          display:flex;
-          flex-direction:column;
-          align-items:center;
-        }
-        .fpowered-inline {
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          padding-top:4px;
-        }
-        .fpowered-inline .tech-logo-link {
-          display:inline-block;
-        }
-        .fpowered-inline .tech-logo {
-          width:120px;
-          height:auto;
-          border-radius:12px;
-          box-shadow: 0 4px 10px rgba(0,0,0,.15);
-          transition: transform .3s, filter .3s;
-          background:#fff;
-          padding:4px;
-        }
-        .fpowered-inline .tech-logo:hover {
-          transform:scale(1.05);
-          filter:brightness(1.1);
-        }
-        .fbot {
-          max-width: 1100px; margin: 0 auto;
-          display: flex; align-items: center; justify-content: space-between;
-          padding-top: 26px; border-top: 1px solid var(--bdr);
-          flex-wrap: wrap; gap: 14px;
-        }
-        .fcopy   { font-size:12px; color:var(--muted2); font-family:'JetBrains Mono',monospace; }
-        .fstatus { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--aqua3); font-family:'JetBrains Mono',monospace; }
-        .fstatus .pulse-dot { width:8px; height:8px; border-radius:50%; background:var(--aqua3); box-shadow:0 0 8px var(--aqua3); animation:pulse 1.8s infinite }
-        @keyframes pulse {0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
-
-        
-
-        /* ── RESPONSIVE ── */
-        /* ── RESPONSIVE ── */
-        /* 1. Ultra-wide & Large Desktop (1440px and up) */
-        @media(min-width: 1440px) {
-          .sec { padding: 160px 0; }
-          .hero-h { font-size: 96px; }
-        }
-
-        /* 2. Standard Desktop & Laptops (1024px to 1439px) */
-        @media(max-width: 1439px) {
-          .sec { padding: 120px 40px; }
-          .feat-layout { gap: 40px; }
-        }
-
-        /* 3. Tablets & iPad OS (768px to 1023px) */
-        @media(max-width: 1023px) {
-          nav { padding: 0 32px; }
-          .nav-links { display: none; }
-          .mob-btn { display: flex; }
-          
-          .hero-h { font-size: clamp(40px, 6vw, 64px); }
-          .hero { padding: 120px 24px 60px; }
-          
-          .feat-layout { grid-template-columns: 1fr; }
-          .feat-preview { display: none; }
-          
-          .ai-tabs { flex-direction: column; }
-          .ai-tab { border-right: none; border-bottom: 1px solid var(--bdr); }
-          .ai-tab:last-child { border-bottom: none; }
-          .ai-body { grid-template-columns: 1fr; padding: 40px; }
-          
-          .steps-grid { grid-template-columns: repeat(2, 1fr); }
-          .pgrid { grid-template-columns: repeat(2, 1fr); }
-          .tgrid { grid-template-columns: repeat(2, 1fr); }
-          .stats-grid { grid-template-columns: repeat(2, 1fr); }
-          
-          .sc { border-right: 1px solid var(--bdr); }
-          .sc:nth-child(even) { border-right: none; }
-          .sc:nth-child(3), .sc:nth-child(4) { border-top: 1px solid var(--bdr); }
-          
-          .crows { grid-template-columns: 1fr; }
-          .pc.hi { transform: none; }
-          .pc.hi:hover { transform: translateY(-5px); }
-          
-          .how-inner, .testi-inner, .ai-inner { padding: 0 32px; }
-          .cta-wrap { padding: 60px 32px; }
-          footer { padding: 64px 32px 36px; }
-          .ftop { flex-direction: column; gap: 40px; }
-        }
-
-        /* 4. Mobile & Small iOS/Android (Max-width 767px) */
-        @media(max-width: 767px) {
-          nav { padding: 0 20px; }
-          .hero { padding: 100px 20px 40px; }
-          .hero-h { font-size: clamp(36px, 10vw, 48px); }
-          .hero-sub { font-size: 16px; margin-bottom: 32px; }
-          .hero-ctas { flex-direction: column; width: 100%; max-width: 320px; margin: 0 auto; }
-          .btn-xl { padding: 14px 32px; width: 100%; text-align: center; }
-          
-          .sec { padding: 80px 20px; }
-          .how-inner, .testi-inner, .ai-inner { padding: 0 20px; }
-          
-          .steps-grid, .pgrid, .tgrid, .stats-grid { grid-template-columns: 1fr; }
-          .sc { border-right: none; border-top: 1px solid var(--bdr); padding: 40px 20px; }
-          .sc:first-child { border-top: none; }
-          
-          .ai-body { padding: 24px; }
-          .krow { grid-template-columns: 1fr; }
-          
-          .cta-wrap { padding: 40px 20px; }
-          .cta-box { padding: 48px 24px; border-radius: 24px; }
-          .cta-box h2 { font-size: clamp(28px, 8vw, 40px); }
-          .cta-btns { flex-direction: column; width: 100%; }
-          .cbtn, .cbtng { width: 100%; text-align: center; margin-bottom: 8px; }
-          
-          footer { padding: 48px 20px 32px; }
-          .ftop { flex-direction: column; gap: 32px; }
-          .fbot { flex-direction: column; align-items: flex-start; gap: 16px; }
-        }
-
-        /* 5. Touch & Accessibility Hardening */
-        @media (hover: none) and (pointer: coarse) {
-          .fi:not(.on):hover { background: transparent; }
-          .step-card:hover { transform: none; box-shadow: none; border-color: var(--bdr); }
-          .pc:hover { transform: none; box-shadow: none; border-color: var(--bdr); }
-          .pc.hi:hover { transform: none; }
-          .tc:hover { transform: none; box-shadow: none; border-color: var(--bdr); }
-        }
-        
-        /* 6. Ultra-small Mobile (iPhone SE bounds - <= 380px) */
-        @media (max-width: 380px) {
-          .kpi { padding: 16px; }
-          .kv { font-size: 24px; }
-          .hero-h { font-size: 32px; }
-          .pamt { font-size: 48px; }
-        }
-      `}</style>
-
-      {/* ── CURSOR ─────────────────────────────────────────────── */}
-      <div className="cg" style={{ left: cursor.x, top: cursor.y }} />
-
-      {/* ══════════════════════════════════════════════════════════
-          NAV
-      ══════════════════════════════════════════════════════════ */}
-      <nav className={scrolled ? "up" : ""}>
-        <a href="#" className="logo">
-          <div className="logo-mark" />
-          Fynovo
-        </a>
-        <ul className="nav-links">
-          {NAV_LINKS.map((l) => (
-            <li key={l}>
-              <a href={`#${l.toLowerCase().replace(/\s+/g, "-")}`}>{l}</a>
-            </li>
-          ))}
-        </ul>
-        <div className="nav-r">
-          <a href="https://fynovo.in/" className="btn-ghost">Log in</a>
-          <a href="https://fynovo.in/" className="btn-solid">Get started free →</a>
-          <button className="mob-btn" onClick={() => setMobileOpen((v) => !v)}>
-            <span /><span /><span />
-          </button>
-        </div>
-      </nav>
-
-      {mobileOpen && (
-        <div className="mob-nav">
-          {NAV_LINKS.map((l) => (
-            <a key={l}
-              href={`#${l.toLowerCase().replace(/\s+/g, "-")}`}
-              onClick={() => setMobileOpen(false)}>
-              {l}
-            </a>
-          ))}
-          <a href="https://fynovo.in/" className="btn-solid" style={{ textAlign: "center" }}>
-            Get started free →
-          </a>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════
-          HERO
-      ══════════════════════════════════════════════════════════ */}
-      <div className="hero">
-        <div className="hero-bg">
-          <div className="hero-base" />
-          <div className="hero-grid" />
-          <div className="scan-line" />
-          <div className="blob b1" />
-          <div className="blob b2" />
-          <div className="blob b3" />
-        </div>
-
-        <div className="badge">
-          <span className="pulse-dot" />
-          Public beta — 30 days free, no card needed
-        </div>
-
-        <h1 className="hero-h">
-          <span className="line1">Your money,</span>
-          <span className="aqua-grad">fully understood.</span>
-        </h1>
-
-        <p className="hero-sub">
-          Fynovo tracks every transaction, analyses every trade, and trims every
-          waste — with an AI built into your dashboard that works only on your
-          own financial data.
-        </p>
-
-        <div className="hero-ctas">
-          <a href="https://fynovo.in/" className="btn-solid btn-xl">Start for free</a>
-          <a href="#fyn-ai" className="btn-ghost btn-xl">Meet Fyn AI ↓</a>
-        </div>
-        <p className="hero-note">// no credit card · setup in 90s · cancel anytime</p>
-
-        {/* ── DASHBOARD MOCK ───────────────────────────────────── */}
-        <div className="dash-wrap rv">
-          <div className="dash-halo" />
-          <div className="dash-frame">
-            <div className="dtop">
-              <div className="wdots">
-                <span className="wd" /><span className="wd" /><span className="wd" />
-              </div>
-              <span className="dtitle">fynovo.app — command center</span>
-              <div className="live-tag"><span className="ldt" />LIVE</div>
-            </div>
-            <div className="dbody">
-              {/* KPI Row */}
-              <div className="krow">
-                {[
-                  { l: "Total Income", v: "₹48,290", b: "↑ 12.4%", u: true, cls: "a", s: [40, 55, 45, 70, 60, 80, 65, 90], c: "#00d4ff" },
-                  { l: "Total Expenses", v: "₹29,114", b: "↓ 3.1%", u: false, cls: "r", s: [80, 70, 75, 65, 70, 60, 65, 55], c: "#ff7aaa" },
-                  { l: "Net Profit", v: "₹19,176", b: "↑ 8.7%", u: true, cls: "m", s: [30, 40, 35, 55, 48, 65, 60, 78], c: "#4facfe" },
-                ].map((k) => (
-                  <div className="kpi" key={k.l}>
-                    <div className="ktop">
-                      <span className="klbl">{k.l}</span>
-                      <span className={k.u ? "kb ku" : "kb kd"}>{k.b}</span>
-                    </div>
-                    <div className={`kv ${k.cls}`}>{k.v}</div>
-                    <div className="spark">
-                      {k.s.map((h, i) => (
-                        <div key={i} className="sp"
-                          style={{ height: `${h}%`, background: k.c, opacity: i === k.s.length - 1 ? 1 : 0.15 + i * 0.1 }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Charts Row */}
-              <div className="crows" ref={chartRef}>
-                <div className="ccard">
-                  <div className="chd">
-                    <div>
-                      <div className="cttl">Revenue Overview</div>
-                      <div className="csub">Jan – Dec 2024</div>
-                    </div>
-                    <span className="yoy">+24% YOY</span>
-                  </div>
-                  <div className="bchart">
-                    {bars.map((h, i) => (
-                      <div className="bw" key={i}>
-                        <div className="bar"
-                          style={{
-                            height: chartIn ? `${h}%` : "3%",
-                            background: hovBar === i
-                              ? "#00f5c4"
-                              : i === 11
-                                ? "var(--aqua)"
-                                : `rgba(0,180,255,${0.15 + h / 350})`,
-                            boxShadow: (hovBar === i || i === 11) ? `0 0 12px rgba(0,212,255,.5)` : "none",
-                            transitionDelay: `${i * 0.04}s`,
-                            transition: "height .9s cubic-bezier(.16,1,.3,1), background .25s, box-shadow .25s",
-                          }}
-                          onMouseEnter={() => setHovBar(i)}
-                          onMouseLeave={() => setHovBar(null)}
-                        />
-                        <span className="bmo">{mos[i]}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="ccard">
-                  <div className="chd">
-                    <div>
-                      <div className="cttl">Expense Split</div>
-                      <div className="csub">This month</div>
-                    </div>
-                  </div>
-                  <div className="dcc">
-                    <svg className="dsvg" width="96" height="96" viewBox="0 0 96 96">
-                      {[
-                        { p: 40, c: "#00d4ff", o: 0 },
-                        { p: 30, c: "#4facfe", o: 40 },
-                        { p: 20, c: "#00f5c4", o: 70 },
-                        { p: 10, c: "#7b9ff9", o: 90 },
-                      ].map((s, i) => {
-                        const r = 34, cx = 48, ci = 2 * Math.PI * r;
-                        const d = (s.p / 100) * ci, g = ci - d;
-                        const rot = (s.o / 100) * 360 - 90;
-                        return (
-                          <circle key={i} cx={cx} cy={cx} r={r} fill="none"
-                            stroke={s.c} strokeWidth="12"
-                            strokeDasharray={`${d} ${g}`}
-                            transform={`rotate(${rot} ${cx} ${cx})`}
-                            strokeLinecap="round"
-                          />
-                        );
-                      })}
-                      <circle cx="48" cy="48" r="20" fill="var(--card2)" />
-                    </svg>
-                    <div className="dleg">
-                      {[
-                        ["#00d4ff", "Operations", "40%"],
-                        ["#4facfe", "Marketing", "30%"],
-                        ["#00f5c4", "Payroll", "20%"],
-                        ["#7b9ff9", "Other", "10%"],
-                      ].map(([c, n, p]) => (
-                        <div className="dl" key={n}>
-                          <div className="dld" style={{ background: c }} />
-                          <span className="dln">{n}</span>
-                          <span className="dlp" style={{ color: c }}>{p}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════════════
-          STATS
-      ══════════════════════════════════════════════════════════ */}
-      <div className="stats-wrap" ref={statsRef}>
-        <div className="stats-grid">
-          {STATS.map((s, i) => <StatCard key={s.label} stat={s} started={statsOn} i={i} />)}
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════════════
-          FEATURES
-      ══════════════════════════════════════════════════════════ */}
-      <section className="sec" id="features">
-        <div className="rv">
-          <span className="tag-ln">Features</span>
-          <h2 className="sec-h">Built for people who take<br />money seriously.</h2>
-          <p className="sec-p">Every tool you actually need — nothing you don't. Designed by ex-traders and financial analysts who got tired of stitching spreadsheets together.</p>
-        </div>
-
-        <div className="feat-layout">
-          <div className="feat-list">
-            {FEATURES.map((f, i) => (
-              <div key={f.title}
-                className={`fi ${focusFeat === i ? "on" : ""}`}
-                onClick={() => handleFeatClick(i)}>
-                <div className="fi-row">
-                  <div className="fi-ico" style={{ background: `${f.color}14`, color: f.color }}>
-                    {f.icon}
-                  </div>
-                  <div>
-                    <div className="fi-meta">
-                      <h3>{f.title}</h3>
-                      <span className="fi-tag" style={{ background: `${f.color}14`, color: f.color }}>
-                        {f.tag}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <p>{f.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          <div
-            className={`feat-preview${isSwitching ? ' changing' : ''}`}
-            style={{ borderColor: `${FEATURES[activeFeat].color}30` }}>
-            {/* progress indicator */}
-            <div
-              className="fp-progress"
-              style={{ width: `${autoProgress * 100}%` }} />
-
-            <div className="fp-content">
-              <div className="fp-ico">{FEATURES[activeFeat].icon}</div>
-              <span className="fp-tag"
-                style={{ background: `${FEATURES[activeFeat].color}14`, color: FEATURES[activeFeat].color }}>
-                {FEATURES[activeFeat].tag}
-              </span>
-              <h4>{FEATURES[activeFeat].title}</h4>
-              <p>{FEATURES[activeFeat].desc}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════
-          FYN AI SHOWCASE
-      ══════════════════════════════════════════════════════════ */}
-      <div className="ai-section" id="fyn-ai">
-        <div className="ai-inner">
-          <div className="rv">
-            <span className="tag-ln">Fyn AI</span>
-            <h2 className="sec-h">An AI that works only<br />on your own data.</h2>
-            <p className="sec-p">Fyn is not a generic chatbot. It's a financial intelligence engine built into your Fynovo account — reading only your transactions, trades, and accounts to surface insights specific to you.</p>
-          </div>
-
-          {/* Tabs */}
-          <div className="ai-tabs rv">
-            {AI_CAPABILITIES.map((cap, i) => (
-              <div key={cap.title}
-                className={`ai-tab ${activeAI === i ? "on" : ""}`}
-                onClick={() => setActiveAI(i)}>
-                <style>{`.ai-tab:nth-child(${i + 1}).on::after { background: linear-gradient(90deg, ${cap.color}, ${i === 0 ? "#00f5c4" : i === 1 ? "#4facfe" : "#4facfe"}); }`}</style>
-                <span className="ai-tab-ico">{cap.icon}</span>
-                <div className="ai-tab-ttl">{cap.title}</div>
-                <div className="ai-tab-sub">
-                  {i === 0 && "P&L · Win rate · Drawdown"}
-                  {i === 1 && "Subscriptions · Categories · Waste"}
-                  {i === 2 && "Net position · Health score · Trends"}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Body */}
-          <div className="ai-body rv">
-            <div className="ai-body-text">
-              <h3 style={{ color: cur.color }}>{cur.title}</h3>
-              <p>{cur.desc}</p>
-              <div className="ai-points">
-                {cur.points.map((pt) => (
-                  <div className="ai-point" key={pt}>
-                    <span className="ai-point-dot" style={{ background: cur.color, boxShadow: `0 0 8px ${cur.color}60` }} />
-                    {pt}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Visual */}
-            <div className="ai-visual">
-              <div className="ai-visual-glow" style={{ background: cur.color }} />
-              <div className="ai-vis-header">
-                <div className="ai-vis-ico" style={{ background: `${cur.color}16`, color: cur.color }}>
-                  {cur.icon}
-                </div>
-                <span className="ai-vis-ttl">Fyn AI · {cur.title}</span>
-                <span className="ai-vis-tag"
-                  style={{ background: `${cur.color}14`, color: cur.color, border: `1px solid ${cur.color}30` }}>
-                  Live
-                </span>
-              </div>
-
-              {/* Tab 0 — Trading P&L */}
-              {activeAI === 0 && (
-                <>
-                  <div className="ai-bar-chart">
-                    {[55, 42, 70, 38, 85, 60, 78, 45, 92, 67, 80, 100].map((h, i) => (
-                      <div key={i} className="ai-bar"
-                        style={{
-                          height: `${h}%`,
-                          background: h > 70
-                            ? `linear-gradient(180deg, var(--aqua) 0%, rgba(0,180,255,.5) 100%)`
-                            : h > 50
-                              ? `rgba(0,180,255,.3)`
-                              : `rgba(255,120,160,.35)`,
-                          boxShadow: h > 70 ? "0 0 10px rgba(0,212,255,.3)" : "none",
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <div className="ai-insight-box">
-                    <span className="ai-ins-ico">💡</span>
-                    <span className="ai-ins-txt">Win rate is 68% this month — 9 pts above your 6-month average. INFY & TCS are top performers.</span>
-                  </div>
-                  <div className="ai-metrics">
-                    {[
-                      { v: "+₹14,320", l: "Net P&L", c: "var(--aqua3)" },
-                      { v: "68%", l: "Win Rate", c: "var(--aqua)" },
-                      { v: "−4.2%", l: "Max Drawdown", c: "#ff7aaa" },
-                      { v: "1.84", l: "Sharpe Ratio", c: "var(--blue)" },
-                    ].map((m) => (
-                      <div className="ai-metric" key={m.l}>
-                        <div className="ai-metric-val" style={{ color: m.c }}>{m.v}</div>
-                        <div className="ai-metric-lbl">{m.l}</div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {/* Tab 1 — Expense Savings */}
-              {activeAI === 1 && (
-                <>
-                  <div className="ai-bar-chart">
-                    {[
-                      { h: 80, lbl: "Adobe" },
-                      { h: 100, lbl: "LinkedIn" },
-                      { h: 38, lbl: "Hotstar" },
-                      { h: 25, lbl: "Audible" },
-                      { h: 60, lbl: "Notion" },
-                      { h: 45, lbl: "Figma" },
-                      { h: 30, lbl: "Grammarly" },
-                    ].map((b, i) => (
-                      <div key={i} className="bw">
-                        <div className="ai-bar"
-                          style={{
-                            height: `${b.h}%`,
-                            background: i < 4
-                              ? `linear-gradient(180deg, var(--aqua3) 0%, rgba(0,200,160,.4) 100%)`
-                              : `rgba(0,200,160,.2)`,
-                            boxShadow: i < 4 ? "0 0 10px rgba(0,245,196,.25)" : "none",
-                          }}
-                        />
-                        <span className="bmo" style={{ fontSize: 8 }}>{b.lbl.slice(0, 4)}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="ai-insight-box">
-                    <span className="ai-ins-ico">✂️</span>
-                    <span className="ai-ins-txt" style={{ color: "var(--aqua3)" }}>4 unused subscriptions found. Cancelling Adobe CC, LinkedIn, Hotstar & Audible saves ₹1,896/month.</span>
-                  </div>
-                  <div className="ai-metrics">
-                    {[
-                      { v: "₹1,896", l: "Monthly Waste", c: "var(--aqua3)" },
-                      { v: "₹22,752", l: "Yearly Savings", c: "var(--aqua3)" },
-                      { v: "4", l: "Dead Subs", c: "var(--aqua)" },
-                      { v: "31%", l: "Above Avg Spend", c: "#ff7aaa" },
-                    ].map((m) => (
-                      <div className="ai-metric" key={m.l}>
-                        <div className="ai-metric-val" style={{ color: m.c }}>{m.v}</div>
-                        <div className="ai-metric-lbl">{m.l}</div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {/* Tab 2 — P&L Clarity */}
-              {activeAI === 2 && (
-                <>
-                  <div className="ai-bar-chart">
-                    {[42, 48, 44, 55, 52, 62, 58, 68, 65, 72, 70, 80].map((h, i) => (
-                      <div key={i} className="ai-bar"
-                        style={{
-                          height: `${h}%`,
-                          background: `linear-gradient(180deg,
-                            rgba(0,212,255,${0.3 + (i / 11) * 0.7}) 0%,
-                            rgba(0,150,220,${0.2 + (i / 11) * 0.5}) 100%)`,
-                          boxShadow: i > 8 ? "0 0 8px rgba(0,212,255,.25)" : "none",
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <div className="ai-insight-box">
-                    <span className="ai-ins-ico">📊</span>
-                    <span className="ai-ins-txt">Net position grew 14.8% over 12 months. Income diversified. One-off Q3 expenses isolated from trend.</span>
-                  </div>
-                  <div className="ai-metrics">
-                    {[
-                      { v: "₹19,176", l: "Net Profit", c: "var(--aqua)" },
-                      { v: "82/100", l: "Health Score", c: "var(--aqua3)" },
-                      { v: "+14.8%", l: "YoY Growth", c: "var(--aqua)" },
-                      { v: "6.2x", l: "Emergency Cover", c: "var(--blue)" },
-                    ].map((m) => (
-                      <div className="ai-metric" key={m.l}>
-                        <div className="ai-metric-val" style={{ color: m.c }}>{m.v}</div>
-                        <div className="ai-metric-lbl">{m.l}</div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════════════
-          HOW IT WORKS
-      ══════════════════════════════════════════════════════════ */}
-      <div className="how-section" id="how-it-works">
-        <div className="how-inner">
-          <div className="rv">
-            <span className="tag-ln">How It Works</span>
-            <h2 className="sec-h">Zero friction.<br />Immediate clarity.</h2>
-            <p className="sec-p">No manual imports. No accountant. Fynovo and Fyn AI handle the tedious parts — you focus on decisions that matter.</p>
-          </div>
-          <div className="steps-grid">
-            {STEPS.map((s, i) => (
-              <div key={s.num} className={`step-card rv rv-${i + 1}`}>
-                <div className="snbg">{s.num}</div>
-                <img src={s.img} alt={s.title} className="step-img" />
-                <h3>{s.title}</h3>
-                <p>{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════════════
-          PRICING
-      ══════════════════════════════════════════════════════════ */}
-      <section className="sec" id="pricing">
-        <div className="rv">
-          <span className="tag-ln">Pricing</span>
-          <h2 className="sec-h">Pay for what you use.<br />Nothing more.</h2>
-          <p className="sec-p">Every plan includes a 30-day free trial. No credit card, no commitment. Fyn AI is included in all plans.</p>
-          <div className="ptog">
-            <button className={`ptb ${billing === "monthly" ? "on" : ""}`} onClick={() => setBilling("monthly")}>Monthly</button>
-            <button className={`ptb ${billing === "annual" ? "on" : ""}`} onClick={() => setBilling("annual")}>
-              Annual<span className="save-chip">−20%</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="pgrid">
-          {PLANS.map((p, i) => {
-            const price = billing === "annual" ? Math.round(p.price * 0.8) : p.price;
-            return (
-              <div key={p.name} className={`pc rv rv-${i + 1} ${p.hi ? "hi" : ""}`}>
-                {p.hi && <div className="pop-tag">Most popular</div>}
-                <div className="pname">{p.name}</div>
-                <div className="pprice">
-                  <span className="pcur">$</span>
-                  <span className="pamt">{price}</span>
-                  <span className="pper">/mo</span>
-                </div>
-                <div className="pdesc">{billing === "annual" ? `Billed $${price * 12}/yr` : p.desc}</div>
-                <div className="pdiv" />
-                <ul className="pfeats">
-                  {p.features.map((f) => (
-                    <li key={f}><span className="pchk">✓</span>{f}</li>
-                  ))}
-                </ul>
-                <a href="https://fynovo.in/" className="pbtn" style={{ textDecoration: 'none', display: 'block', textAlign: 'center' }}>{p.cta}</a>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════
-          TESTIMONIALS
-      ══════════════════════════════════════════════════════════ */}
-      <div className="testi-section">
-        <div className="testi-inner">
-          <div className="rv">
-            <span className="tag-ln">Real users</span>
-            <h2 className="sec-h">People who switched<br />and never looked back.</h2>
-          </div>
-          <div className="tgrid">
-            {TESTIMONIALS.map((t, i) => (
-              <div key={t.name} className={`tc rv rv-${i + 1}`}>
-                <div className="stars">
-                  {[...Array(5)].map((_, j) => <span key={j} className="star">★</span>)}
-                </div>
-                <p className="tq">{t.q}</p>
-                <div className="tf">
-                  <div className="tav"
-                    style={{ background: `linear-gradient(135deg, ${t.c} 0%, ${t.c}99 100%)` }}>
-                    {t.avatar}
-                  </div>
-                  <div>
-                    <div className="tname">{t.name}</div>
-                    <div className="trole">{t.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════════════
-          CTA
-      ══════════════════════════════════════════════════════════ */}
-      <div className="cta-wrap">
-        <div className="cta-box rv">
-          <h2>Stop guessing.<br />Start knowing.</h2>
-          <p>Join 40,000+ users who made the switch to financial clarity. Set up in 90 seconds, Fyn AI included.</p>
-          <div className="cta-btns">
-            <a href="https://fynovo.in/" className="cbtn" style={{ textDecoration: 'none' }}>Start free — no card needed</a>
-            <button className="cbtng">Schedule a demo</button>
-          </div>
-        </div>
-      </div>
-
-
-      {/* ══════════════════════════════════════════════════════════
-          FOOTER
-      ══════════════════════════════════════════════════════════ */}
-      <footer>
-        <div className="ftop">
-          <div>
-            <div className="fbrand">Fynovo</div>
-            <p className="ftagline">Smart financial management for individuals and teams who think in numbers.</p>
-            <div className="fsoc">
-              {[
-                {icon: '𝕏', href: '#'},
-                {icon: 'in', href: 'https://www.linkedin.com/company/tech-vaseegrah/posts/?feedView=all'},
-                {icon: '▶', href: '#'},
-                {icon: '◎', href: '#'}
-              ].map((s, i) => <a key={i} href={s.href} className="fsb" target="_blank" rel="noopener noreferrer">{s.icon}</a>)}
-            </div>
-          </div>
-          {/* powered by column */}
-          <div className="fpowered-container">
-            <div className="fct">Powered by</div>
-            <div className="fpowered-inline">
-              <a href="https://www.techvaseegrah.com/" target="_blank" rel="noopener noreferrer" className="tech-logo-link">
-                <img className="tech-logo" src="/images/tech_vaseegrah_logo.jpeg" alt="Tech Vaseegrah" />
-              </a>
-            </div>
-          </div>
-          <div className="fnavcols">
-            {[
-              { title: "Company", links: ["About", "Blog", "Careers", "Press"] },
-              { title: "Legal", links: ["Privacy", "Terms", "Security", "Contact"] },
-              { title: "Product", links: ["Features", "Fyn AI", "Pricing", "Changelog", "Roadmap"] },
-            ].map((col) => (
-              <div key={col.title}>
-                <div className="fct">{col.title}</div>
-                <ul className="flinks">
-                  {col.links.map((l) => <li key={l}><a href="#">{l}</a></li>)}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="fbot">
-          <div className="fcopy">© 2025 Fynovo, Inc. All rights reserved.</div>
-          <div className="fstatus">
-            <span className="pulse-dot" />All systems operational
-          </div>
-        </div>
-      </footer>
+      <Cursor/>
+      <Nav/>
+      <Hero/>
+      <Stats/>
+      <Features/>
+      <Showcase/>
+      <DeepFeat tag="Tax Automation" h1="Never miss a" hItalic="tax liability." body="The real-time tax engine tracks GST, TDS, and Income Tax across every transaction. Your Tax Optimization Score surfaces legal savings — every month, automatically." checks={["Auto GST across all business transactions","Income tax slab tracking with cess","TDS management for freelancers & SMEs","Personalised Tax Optimization Score"]} imgLabel="Tax Engine Screen" imgNum="16" />
+      <DeepFeat reverse tag="Asset Intelligence" h1="5-year projections," hItalic="live markets." body="Gold, silver, equities, crypto — every asset tracked with AI forecasts built on real Indian market data. Know what your portfolio is worth today, and in 2030." checks={["Physical: Gold & Silver via live CME","Equities via BSE/NSE real-time feeds","Crypto portfolio with rebalancing alerts","Confidence-interval 5-year projections"]} imgLabel="Portfolio Screen" imgNum="17" />
+      <Pricing/>
+      <Testimonials/>
+      <Integrations/>
+      <CTA/>
+      <Footer/>
     </>
   );
 }
