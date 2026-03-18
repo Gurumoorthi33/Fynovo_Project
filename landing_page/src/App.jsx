@@ -1,160 +1,20 @@
 import { useState, useEffect, useRef } from "react";
+import "./index.css";
 
 /* ============================================================
-   FYNOVO V3 — DARK LUXURY EDITORIAL
-   Direction: Late-night trading terminal × high-fashion editorial
-   Fonts: Playfair Display (editorial serif) × DM Mono (data)
-   Colors: Cream #F0EBE0 · Ink #0D0D0F · Acid #C8F23A · Rust #C94A2A
-   Layout: Asymmetric grid-breaking · NO cards everywhere · 
-           Real editorial proportions · Human-made feel
+   FYNOVO — Teal #005F7A · Animations · Bold Typography
+   Fonts: Plus Jakarta Sans 800 (headings) · Outfit 400 (body) · DM Mono (labels)
    ============================================================ */
 
-const G = `
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Sans:wght@400;500;600&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --ink:#0D0D0F; --ink2:#1A1A1E; --ink3:#252528;
-  --cream:#F0EBE0; --cream2:#D8D2C6; --cream3:#9A9488;
-  --acid:#C8F23A; --rust:#C94A2A; --gold:#D4A843;
-  --b:rgba(240,235,224,.07); --b2:rgba(240,235,224,.13);
-}
-html{scroll-behavior:smooth;overflow-x:hidden}
-body{font-family:'Instrument Sans',sans-serif;background:var(--ink);color:var(--cream);overflow-x:hidden;cursor:none;line-height:1.65}
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-track{background:var(--ink)}
-::-webkit-scrollbar-thumb{background:var(--acid)}
-
-/* CURSOR */
-#c{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--acid);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s,border-radius .2s}
-#cr{position:fixed;top:0;left:0;width:34px;height:34px;border:1px solid rgba(200,242,58,.35);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%)}
-#c.big{width:18px;height:18px;background:var(--rust)}
-#cr.big{width:52px;height:52px;border-color:rgba(201,74,42,.4)}
-
-/* NOISE */
-body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.55}
-
-/* TYPE */
-.disp{font-family:'Playfair Display',serif;font-weight:900;line-height:.95;letter-spacing:-.025em}
-.disp-i{font-family:'Playfair Display',serif;font-style:italic;font-weight:400;line-height:1.1}
-.mono{font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
-
-/* KEYFRAMES */
-@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeL{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
-@keyframes fadeR{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-@keyframes scIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
-@keyframes drawLine{to{stroke-dashoffset:0}}
-@keyframes areaIn{to{opacity:1}}
-@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@keyframes gradMove{0%{background-position:0% 0%}50%{background-position:100% 100%}100%{background-position:0% 0%}}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-@keyframes scanline{0%{top:-2px}100%{top:100%}}
-@keyframes glitch{0%,91%,100%{transform:none}92%{transform:skewX(1.5deg);clip-path:inset(15% 0 65% 0)}94%{transform:skewX(-1deg);clip-path:inset(65% 0 5% 0)}96%{transform:none;clip-path:none}}
-@keyframes underline{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes acidPulse{0%,100%{box-shadow:0 0 0 0 rgba(200,242,58,0)}50%{box-shadow:0 0 0 10px rgba(200,242,58,0)}}
-@keyframes spinSlow{to{transform:rotate(360deg)}}
-
-/* REVEAL */
-.r{opacity:0}.r.on{animation:fadeUp .7s cubic-bezier(.16,1,.3,1) both}
-.rl{opacity:0}.rl.on{animation:fadeL .7s cubic-bezier(.16,1,.3,1) both}
-.rr{opacity:0}.rr.on{animation:fadeR .7s cubic-bezier(.16,1,.3,1) both}
-.rs{opacity:0}.rs.on{animation:scIn .65s cubic-bezier(.16,1,.3,1) both}
-.d1{animation-delay:.06s!important}.d2{animation-delay:.13s!important}.d3{animation-delay:.22s!important}
-.d4{animation-delay:.32s!important}.d5{animation-delay:.44s!important}.d6{animation-delay:.58s!important}
-
-/* NAV */
-.nav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 52px;z-index:1000;transition:background .5s,border .4s}
-.nav.s{background:rgba(13,13,15,.86);backdrop-filter:blur(24px);border-bottom:1px solid var(--b)}
-.logo{font-family:'Playfair Display',serif;font-weight:900;font-size:22px;color:var(--cream);text-decoration:none;letter-spacing:-.04em}
-.logo em{font-style:italic;color:var(--acid)}
-.nav-links{display:flex;gap:36px}
-.nav-links a{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--cream3);text-decoration:none;transition:color .2s}
-.nav-links a:hover{color:var(--cream)}
-.cta-btn{background:var(--acid);color:var(--ink);border:none;padding:10px 26px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:none;transition:all .2s}
-.cta-btn:hover{background:var(--cream);transform:translateY(-1px)}
-
-/* IMAGE PLACEHOLDER — editorial film frame style */
-.ph{position:relative;overflow:hidden;background:var(--ink2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ph::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--ink2) 0%,#202028 50%,var(--ink2) 100%);background-size:200% 200%;animation:gradMove 5s ease infinite}
-.ph-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px}
-.ph-cross{position:relative;width:32px;height:32px;flex-shrink:0}
-.ph-cross::before,.ph-cross::after{content:'';position:absolute;background:rgba(200,242,58,.25)}
-.ph-cross::before{width:1px;height:100%;left:50%;top:0}
-.ph-cross::after{height:1px;width:100%;top:50%;left:0}
-.ph-txt{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,242,58,.4)}
-.ph-sub{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:rgba(240,235,224,.15);text-align:center}
-/* Corner marks */
-.ph::after{content:'';position:absolute;inset:0;background:
-  linear-gradient(to right,rgba(200,242,58,.18) 1px,transparent 1px) 0 0/12px 12px,
-  linear-gradient(to bottom,rgba(200,242,58,.18) 1px,transparent 1px) 0 0/12px 12px,
-  linear-gradient(to left,rgba(200,242,58,.18) 1px,transparent 1px) 100% 100%/12px 12px,
-  linear-gradient(to top,rgba(200,242,58,.18) 1px,transparent 1px) 100% 100%/12px 12px;
-background-repeat:no-repeat;pointer-events:none;z-index:3}
-.ph-num{position:absolute;top:12px;right:14px;font-family:'DM Mono',monospace;font-size:9px;color:rgba(240,235,224,.18);z-index:4;letter-spacing:.1em}
-.ph-label{position:absolute;bottom:12px;left:14px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:rgba(200,242,58,.4);z-index:4}
-
-/* CHIP */
-.chip{display:inline-flex;flex-direction:column;padding:12px 16px;border:1px solid var(--b2);background:var(--ink2);gap:4px}
-.chip-v{font-family:'DM Mono',monospace;font-weight:500;font-size:20px;color:var(--cream)}
-.chip-l{font-size:10px;color:var(--cream3);letter-spacing:.06em}
-.chip-d{font-family:'DM Mono',monospace;font-size:10px;color:var(--acid)}
-
-/* TAG */
-.tag{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(200,242,58,.28);padding:5px 12px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--acid)}
-.tag::before{content:'';width:4px;height:4px;background:var(--acid);border-radius:50%;animation:acidPulse 2.5s ease-in-out infinite}
-
-/* FEATURE ROW */
-.feat-row{display:grid;grid-template-columns:52px 1fr 24px;gap:24px;padding:28px 0;border-bottom:1px solid var(--b);cursor:default;transition:padding-left .25s}
-.feat-row:hover{padding-left:8px}
-.feat-row:hover .fn{color:var(--acid)}
-.feat-row:hover .ft{color:var(--acid)}
-.feat-row:hover .fa{opacity:1;transform:translateX(0)}
-.fn{font-family:'DM Mono',monospace;font-size:10px;color:rgba(240,235,224,.25);padding-top:4px;transition:color .2s}
-.ft{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;margin-bottom:8px;transition:color .25s}
-.fb{font-size:13px;color:var(--cream3);line-height:1.65;max-width:460px}
-.fa{font-size:16px;color:var(--acid);opacity:0;transform:translateX(-10px);transition:all .28s;padding-top:4px}
-
-/* PRICE TABLE */
-.pt{display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;border:1px solid var(--b2)}
-.pc{padding:44px 40px;position:relative;transition:background .3s}
-.pc:hover{background:rgba(240,235,224,.025)}
-.pc.hot{background:linear-gradient(170deg,rgba(200,242,58,.055) 0%,transparent 55%)}
-.pd{background:var(--b2)}
-.pn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream3);margin-bottom:22px}
-.pamt{font-family:'Playfair Display',serif;font-weight:900;font-size:60px;line-height:1;letter-spacing:-.04em;margin-bottom:6px}
-.pamt em{font-size:24px;font-style:normal;color:var(--cream3)}
-.pper{font-family:'DM Mono',monospace;font-size:9px;color:var(--cream3);letter-spacing:.1em;margin-bottom:40px}
-.pf{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--cream2);padding:10px 0;border-bottom:1px solid rgba(240,235,224,.05)}
-.pf::before{content:'—';color:var(--acid);font-family:'DM Mono',monospace;font-size:11px;flex-shrink:0}
-.pbtn{margin-top:40px;width:100%;padding:14px;border:1px solid;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:none;transition:all .25s;background:transparent}
-.pbtn.o{border-color:var(--b2);color:var(--cream3)}.pbtn.o:hover{border-color:var(--cream);color:var(--cream)}
-.pbtn.a{border-color:var(--acid);color:var(--acid)}.pbtn.a:hover{background:var(--acid);color:var(--ink)}
-.pbtn.s{background:var(--cream);border-color:var(--cream);color:var(--ink)}.pbtn.s:hover{background:var(--acid);border-color:var(--acid)}
-
-/* TESTI */
-.tc{padding:40px;border:1px solid var(--b);background:var(--ink2);position:relative;transition:transform .3s,border-color .3s;cursor:default}
-.tc:hover{transform:translateY(-5px);border-color:var(--b2)}
-.tc::before{content:'"';font-family:'Playfair Display',serif;font-size:90px;line-height:1;color:rgba(200,242,58,.08);position:absolute;top:12px;left:28px;pointer-events:none}
-
-/* INTEGRATION ITEM */
-.ii{display:flex;flex-direction:column;align-items:center;gap:14px;padding:28px 20px;border-right:1px solid var(--b);border-bottom:1px solid var(--b);transition:background .25s;cursor:default}
-.ii:hover{background:rgba(200,242,58,.03)}
-.ii:hover .in{color:var(--acid)}
-.in{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--cream3);text-align:center;transition:color .2s}
-
-/* STAT */
-.sn{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(52px,7vw,88px);line-height:1;letter-spacing:-.04em}
-.sn em{color:var(--acid);font-style:normal}
-`;
-
-/* useReveal hook */
 function useReveal(t = 0.1) {
   const ref = useRef(null);
   const [on, setOn] = useState(false);
   useEffect(() => {
     const el = ref.current; if (!el) return;
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setOn(true); obs.disconnect(); } }, { threshold: t });
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setOn(true); obs.disconnect(); } },
+      { threshold: t }
+    );
     obs.observe(el); return () => obs.disconnect();
   }, [t]);
   return [ref, on];
@@ -164,196 +24,285 @@ function R({ c = "r", d = "", children, style = {} }) {
   return <div ref={ref} className={`${c} ${d} ${on ? "on" : ""}`} style={style}>{children}</div>;
 }
 
-/* Cursor */
-function Cursor() {
-  const cRef = useRef(null), rRef = useRef(null);
-  const p = useRef({ cx: 0, cy: 0, rx: 0, ry: 0 });
-  useEffect(() => {
-    const mv = e => { p.current.cx = e.clientX; p.current.cy = e.clientY; };
-    document.addEventListener("mousemove", mv);
-    let raf;
-    const loop = () => {
-      p.current.rx += (p.current.cx - p.current.rx) * .09;
-      p.current.ry += (p.current.cy - p.current.ry) * .09;
-      if (cRef.current) cRef.current.style.transform = `translate(${p.current.cx}px,${p.current.cy}px) translate(-50%,-50%)`;
-      if (rRef.current) rRef.current.style.transform = `translate(${p.current.rx}px,${p.current.ry}px) translate(-50%,-50%)`;
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    const ov = e => {
-      const isHot = e.target.closest("button,.cta-btn,.pbtn,a");
-      cRef.current?.classList.toggle("big", !!isHot);
-      rRef.current?.classList.toggle("big", !!isHot);
-    };
-    document.addEventListener("mouseover", ov);
-    return () => { document.removeEventListener("mousemove", mv); document.removeEventListener("mouseover", ov); cancelAnimationFrame(raf); };
-  }, []);
-  return <><div id="c" ref={cRef}/><div id="cr" ref={rRef}/></>;
-}
+/* ---- SVG icons for placeholders ---- */
+const IconDashboard = () => (
+  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <rect x="2" y="2" width="32" height="32" rx="4" stroke="white" strokeOpacity=".4" strokeWidth="1.2"/>
+    <rect x="6" y="8" width="10" height="6" rx="2" fill="white" fillOpacity=".3"/>
+    <rect x="20" y="8" width="10" height="6" rx="2" fill="white" fillOpacity=".3"/>
+    <rect x="6" y="20" width="6" height="10" rx="2" fill="white" fillOpacity=".45"/>
+    <rect x="15" y="16" width="6" height="14" rx="2" fill="white" fillOpacity=".45"/>
+    <rect x="24" y="12" width="6" height="18" rx="2" fill="white" fillOpacity=".55"/>
+  </svg>
+);
+const IconChart = () => (
+  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <polyline points="4,28 10,18 16,22 22,10 28,14 34,6" stroke="white" strokeOpacity=".7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <circle cx="10" cy="18" r="2.5" fill="white" fillOpacity=".6"/>
+    <circle cx="22" cy="10" r="2.5" fill="white" fillOpacity=".6"/>
+    <circle cx="34" cy="6"  r="2.5" fill="white" fillOpacity=".6"/>
+  </svg>
+);
+const IconDoc = () => (
+  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <rect x="6" y="2" width="22" height="28" rx="3" stroke="white" strokeOpacity=".4" strokeWidth="1.2"/>
+    <rect x="10" y="8"  width="14" height="2" rx="1" fill="white" fillOpacity=".4"/>
+    <rect x="10" y="13" width="10" height="2" rx="1" fill="white" fillOpacity=".3"/>
+    <rect x="10" y="18" width="12" height="2" rx="1" fill="white" fillOpacity=".3"/>
+    <circle cx="27" cy="28" r="5" fill="white" fillOpacity=".2" stroke="white" strokeOpacity=".4" strokeWidth="1.2"/>
+    <path d="M25 28l1.5 1.5L29 26.5" stroke="white" strokeOpacity=".7" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+const IconAI = () => (
+  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="18" r="10" stroke="white" strokeOpacity=".4" strokeWidth="1.2"/>
+    <circle cx="18" cy="18" r="4"  fill="white" fillOpacity=".35"/>
+    <line x1="18" y1="4"  x2="18" y2="8"  stroke="white" strokeOpacity=".5" strokeWidth="1.5" strokeLinecap="round"/>
+    <line x1="18" y1="28" x2="18" y2="32" stroke="white" strokeOpacity=".5" strokeWidth="1.5" strokeLinecap="round"/>
+    <line x1="4"  y1="18" x2="8"  y2="18" stroke="white" strokeOpacity=".5" strokeWidth="1.5" strokeLinecap="round"/>
+    <line x1="28" y1="18" x2="32" y2="18" stroke="white" strokeOpacity=".5" strokeWidth="1.5" strokeLinecap="round"/>
+    <circle cx="18" cy="18" r="1.5" fill="white"/>
+  </svg>
+);
+const IconPortfolio = () => (
+  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="18" r="14" stroke="white" strokeOpacity=".3" strokeWidth="1.2"/>
+    <path d="M18 4 A14 14 0 0 1 32 18" stroke="white" strokeOpacity=".7" strokeWidth="3" strokeLinecap="round"/>
+    <path d="M18 4 A14 14 0 0 0 5 25" stroke="white" strokeOpacity=".45" strokeWidth="3" strokeLinecap="round"/>
+    <circle cx="18" cy="18" r="3" fill="white" fillOpacity=".5"/>
+  </svg>
+);
+const IconPhone = () => (
+  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <rect x="10" y="2" width="16" height="28" rx="4" stroke="white" strokeOpacity=".4" strokeWidth="1.2"/>
+    <rect x="13" y="6" width="10" height="14" rx="2" fill="white" fillOpacity=".15"/>
+    <circle cx="18" cy="26" r="1.5" fill="white" fillOpacity=".4"/>
+    <rect x="14" y="8"  width="8" height="1.5" rx=".75" fill="white" fillOpacity=".3"/>
+    <rect x="14" y="12" width="6" height="1.5" rx=".75" fill="white" fillOpacity=".2"/>
+  </svg>
+);
+const IconGrid = () => (
+  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <rect x="3"  y="3"  width="13" height="13" rx="3" fill="white" fillOpacity=".3"/>
+    <rect x="20" y="3"  width="13" height="13" rx="3" fill="white" fillOpacity=".2"/>
+    <rect x="3"  y="20" width="13" height="13" rx="3" fill="white" fillOpacity=".2"/>
+    <rect x="20" y="20" width="13" height="13" rx="3" fill="white" fillOpacity=".3"/>
+  </svg>
+);
+const PH_ICON = { dashboard: IconDashboard, chart: IconChart, doc: IconDoc, ai: IconAI, portfolio: IconPortfolio, phone: IconPhone, grid: IconGrid };
+
+/* Rich SVG dashboard mockup for hero */
+const HeroDashboard = () => (
+  <svg viewBox="0 0 400 268" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "90%", maxWidth: 400 }}>
+    {/* App window */}
+    <rect x="0" y="0" width="400" height="268" rx="12" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.18)" strokeWidth="1"/>
+    {/* Title bar */}
+    <rect x="0" y="0" width="400" height="36" rx="12" fill="rgba(0,0,0,.25)"/>
+    <rect x="0" y="24" width="400" height="12" fill="rgba(0,0,0,.25)"/>
+    <circle cx="18" cy="18" r="5" fill="rgba(255,100,100,.4)"/>
+    <circle cx="32" cy="18" r="5" fill="rgba(255,200,0,.35)"/>
+    <circle cx="46" cy="18" r="5" fill="rgba(100,220,100,.35)"/>
+    <rect x="62" y="13" width="40" height="10" rx="3" fill="rgba(255,255,255,.2)"/>
+    {/* Nav items */}
+    <rect x="230" y="13" width="22" height="10" rx="3" fill="rgba(255,255,255,.1)"/>
+    <rect x="258" y="13" width="22" height="10" rx="3" fill="rgba(255,255,255,.1)"/>
+    <rect x="286" y="13" width="22" height="10" rx="3" fill="rgba(255,255,255,.1)"/>
+    <rect x="316" y="11" width="38" height="14" rx="5" fill="rgba(255,255,255,.28)"/>
+    {/* Stat cards */}
+    <rect x="12" y="48" width="108" height="56" rx="8" fill="rgba(255,255,255,.1)"/>
+    <rect x="20" y="57" width="36" height="7" rx="3" fill="rgba(255,255,255,.22)"/>
+    <rect x="20" y="68" width="52" height="18" rx="4" fill="rgba(255,255,255,.32)"/>
+    <rect x="76" y="74" width="28" height="12" rx="3" fill="rgba(255,255,255,.15)"/>
+    <rect x="132" y="48" width="108" height="56" rx="8" fill="rgba(255,255,255,.1)"/>
+    <rect x="140" y="57" width="36" height="7" rx="3" fill="rgba(255,255,255,.22)"/>
+    <rect x="140" y="68" width="44" height="18" rx="4" fill="rgba(255,255,255,.32)"/>
+    <rect x="196" y="74" width="28" height="12" rx="3" fill="rgba(255,255,255,.15)"/>
+    <rect x="252" y="48" width="136" height="56" rx="8" fill="rgba(255,255,255,.1)"/>
+    <rect x="260" y="57" width="36" height="7" rx="3" fill="rgba(255,255,255,.22)"/>
+    <rect x="260" y="68" width="36" height="18" rx="4" fill="rgba(255,255,255,.32)"/>
+    <rect x="316" y="74" width="36" height="12" rx="3" fill="rgba(255,255,255,.1)"/>
+    {/* Chart area */}
+    <rect x="12" y="116" width="236" height="140" rx="8" fill="rgba(255,255,255,.07)"/>
+    <rect x="22" y="126" width="64" height="8" rx="3" fill="rgba(255,255,255,.16)"/>
+    {/* Bar chart */}
+    <rect x="28"  y="202" width="20" height="42" rx="3" fill="rgba(255,255,255,.2)"/>
+    <rect x="56"  y="182" width="20" height="62" rx="3" fill="rgba(255,255,255,.25)"/>
+    <rect x="84"  y="190" width="20" height="54" rx="3" fill="rgba(255,255,255,.2)"/>
+    <rect x="112" y="170" width="20" height="74" rx="3" fill="rgba(255,255,255,.3)"/>
+    <rect x="140" y="178" width="20" height="66" rx="3" fill="rgba(255,255,255,.25)"/>
+    <rect x="168" y="158" width="20" height="86" rx="3" fill="rgba(255,255,255,.35)"/>
+    <rect x="196" y="165" width="20" height="79" rx="3" fill="rgba(255,255,255,.28)"/>
+    {/* Trend line */}
+    <polyline points="38,202 66,184 94,192 122,170 150,178 178,158 206,165"
+      stroke="rgba(255,255,255,.75)" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+    <circle cx="38"  cy="202" r="3.5" fill="white" fillOpacity=".75"/>
+    <circle cx="178" cy="158" r="3.5" fill="white" fillOpacity=".75"/>
+    <circle cx="206" cy="165" r="3.5" fill="white" fillOpacity=".75"/>
+    {/* Right panel */}
+    <rect x="260" y="116" width="128" height="140" rx="8" fill="rgba(255,255,255,.07)"/>
+    <rect x="270" y="128" width="68" height="8" rx="3" fill="rgba(255,255,255,.16)"/>
+    <rect x="270" y="142" width="50" height="5" rx="2.5" fill="rgba(255,255,255,.1)"/>
+    <rect x="270" y="152" width="58" height="5" rx="2.5" fill="rgba(255,255,255,.1)"/>
+    <rect x="270" y="162" width="42" height="5" rx="2.5" fill="rgba(255,255,255,.1)"/>
+    {/* Donut */}
+    <circle cx="324" cy="202" r="26" stroke="rgba(255,255,255,.18)" strokeWidth="12" fill="none"/>
+    <circle cx="324" cy="202" r="26" stroke="rgba(255,255,255,.65)" strokeWidth="12" fill="none" strokeDasharray="60 163" strokeLinecap="round" strokeDashoffset="-8"/>
+    <circle cx="324" cy="202" r="26" stroke="rgba(255,255,255,.35)" strokeWidth="12" fill="none" strokeDasharray="38 185" strokeLinecap="round" strokeDashoffset="-68"/>
+  </svg>
+);
 
 /* Image Placeholder */
-function Ph({ label = "PHOTO", num = "00", style = {}, children }) {
+function Ph({ label = "Photo", num = "00", style = {}, type = "grid", src = null, mockup = null, children }) {
+  if (src) {
+    return (
+      <div className="ph" style={style}>
+        <img src={src} alt={label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        {children}
+      </div>
+    );
+  }
+  const Icon = PH_ICON[type] || PH_ICON.grid;
   return (
     <div className="ph" style={style}>
-      <div className="ph-inner">
-        <div className="ph-cross"/>
-        <div className="ph-txt">{label}</div>
-        {num && <div className="ph-sub">Slot {num}</div>}
-      </div>
+      <div className="ph-grid" />
+      {mockup
+        ? <div style={{ position: "relative", zIndex: 2, width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>{mockup}</div>
+        : <div className="ph-inner"><div className="ph-icon-wrap"><Icon /></div><div className="ph-label">{label}</div></div>
+      }
+      <div className="ph-c tl" /><div className="ph-c tr" />
+      <div className="ph-c bl" /><div className="ph-c br" />
       <div className="ph-num">{num}</div>
-      <div className="ph-label">{label}</div>
       {children}
     </div>
   );
 }
 
-/* Scanline */
-function Scanline() {
+function Eyebrow({ text }) {
   return (
-    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden", zIndex: 5 }}>
-      <div style={{
-        position: "absolute", left: 0, right: 0, height: "2px",
-        background: "linear-gradient(transparent, rgba(200,242,58,.04), transparent)",
-        animation: "scanline 9s linear infinite"
-      }}/>
+    <div className="eyebrow">
+      <div className="eyebrow-line" />
+      <span className="label">{text}</span>
     </div>
   );
 }
 
-/* Navbar */
+/* ========================================================== NAV */
 function Nav() {
   const [s, setS] = useState(false);
-  useEffect(() => { const fn = () => setS(window.scrollY > 40); window.addEventListener("scroll", fn); return () => window.removeEventListener("scroll", fn); }, []);
+  useEffect(() => {
+    const fn = () => setS(window.scrollY > 40);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
   return (
     <nav className={`nav${s ? " s" : ""}`}>
-      <a href="#" className="logo">Fy<em>novo</em></a>
-      <div className="nav-links">
-        {["Platform", "Pricing", "Integrations", "Journal"].map(l => <a key={l} href="#">{l}</a>)}
-      </div>
-      <button className="cta-btn">Open Account →</button>
+      <a href="#" className="nav-logo">Fy<em>novo</em></a>
+      <ul className="nav-links">
+        {["Platform", "Pricing", "Integrations", "Journal"].map(l => (
+          <li key={l}><a href="#">{l}</a></li>
+        ))}
+      </ul>
+      <button className="btn btn-primary">Open Account →</button>
     </nav>
   );
 }
 
-/* Hero */
+/* ========================================================== HERO */
 function Hero() {
   return (
-    <section style={{ minHeight: "100vh", paddingTop: 64, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", background: "var(--ink)" }}>
-      <Scanline/>
-      {/* Editorial BG number */}
-      <div style={{ position: "absolute", right: -30, top: "8%", fontFamily: "'Playfair Display',serif", fontWeight: 900, fontSize: "clamp(160px,19vw,260px)", lineHeight: 1, color: "rgba(240,235,224,.02)", pointerEvents: "none", userSelect: "none", letterSpacing: "-.05em", zIndex: 0 }}>2025</div>
+    <section style={{ minHeight: "100vh", paddingTop: 68, background: "var(--bg)", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+      {/* Animated background blobs */}
+      <div style={{ position: "absolute", top: -180, right: -160, width: 640, height: 640, borderRadius: "50%", background: "radial-gradient(circle, var(--primary-pale) 0%, transparent 68%)", pointerEvents: "none", zIndex: 0, animation: "blobDrift 12s ease-in-out infinite" }} />
+      <div style={{ position: "absolute", bottom: 40, left: -100, width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, var(--primary-bg) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0, animation: "blobDrift 16s ease-in-out infinite reverse" }} />
 
-      {/* Top ticker */}
-      <div style={{ borderBottom: "1px solid var(--b)", padding: "11px 0", overflow: "hidden", flexShrink: 0, position: "relative", zIndex: 2 }}>
-        <div style={{ display: "flex", width: "max-content", animation: "marquee 24s linear infinite" }}>
+      {/* Ticker */}
+      <div className="ticker" style={{ position: "relative", zIndex: 2 }}>
+        <div className="ticker-inner">
           {[...Array(3)].flatMap((_, pass) =>
             ["GST AUTO-CALC", "SHOPIFY SYNC", "LIVE NSE FEED", "TDS TRACKING", "5-YR FORECAST", "AI ADVISOR", "RAZORPAY LINKED", "AUDIT TRAIL", "GROQ LLAMA 3.3", "MULTI-TENANT"].map((t, i) => (
-              <span key={`${pass}-${i}`} style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, letterSpacing: ".22em", color: i % 3 === 0 ? "var(--acid)" : "rgba(240,235,224,.25)", padding: "0 32px", borderRight: "1px solid var(--b)" }}>{t}</span>
+              <span key={`${pass}-${i}`} className={`ticker-item${i % 4 === 0 ? " hi" : ""}`}>{t}</span>
             ))
           )}
         </div>
       </div>
 
-      {/* Main layout: editorial asymmetric */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1px 500px", flex: 1, position: "relative", zIndex: 2 }}>
-        {/* LEFT — big headline */}
-        <div style={{ padding: "72px 56px 72px 52px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-          <div>
-            <R>
-              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 40 }}>
-                <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
-                <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Financial Intelligence</span>
-              </div>
-            </R>
-            <R c="r" d="d1">
-              <h1 className="disp" style={{ fontSize: "clamp(54px,7.5vw,100px)", color: "var(--cream)", animation: "glitch 10s ease-in-out infinite" }}>
-                Automates<br/>Your <em className="disp-i" style={{ color: "var(--acid)" }}>Taxes,</em><br/>Assets &amp;<br/>Cashflow.
-              </h1>
-            </R>
-            <R c="r" d="d2" style={{ marginTop: 36 }}>
-              <p style={{ fontSize: 15, color: "var(--cream3)", lineHeight: 1.78, maxWidth: 440 }}>
-                Fynovo is the operating layer for your finances. It connects every rupee across platforms, computes your tax position in real time, and sends you AI-driven moves — before your CA does.
-              </p>
-            </R>
-          </div>
-
-          <div>
-            <R c="r" d="d3">
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 36 }}>
-                {[["₹4.2L","Revenue today","↑18.4%"],["₹3.1L","Net profit","↑24.1%"],["84/100","Tax score","Optimised"]].map(([v,l,d]) => (
-                  <div className="chip" key={l}>
-                    <div className="chip-v">{v}</div>
-                    <div className="chip-l">{l}</div>
-                    <div className="chip-d">{d}</div>
-                  </div>
-                ))}
-              </div>
-            </R>
-            <R c="r" d="d4">
-              <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
-                <button className="cta-btn" style={{ padding: "14px 40px", fontSize: 11 }}>Start Free — ₹0</button>
-                <button style={{ background: "none", border: "none", cursor: "none", color: "var(--cream3)", fontFamily: "'DM Mono',monospace", fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 10, transition: "color .2s" }}
-                  onMouseEnter={e => e.currentTarget.style.color = "var(--cream)"}
-                  onMouseLeave={e => e.currentTarget.style.color = "var(--cream3)"}>
-                  <span style={{ width: 36, height: 36, border: "1px solid var(--b2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>▷</span>
-                  Watch 90s demo
-                </button>
-              </div>
-            </R>
-          </div>
-        </div>
-
-        <div style={{ background: "var(--b)" }}/>
-
-        {/* RIGHT — photo collage */}
+      {/* Main grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 540px", flex: 1, maxWidth: "var(--max)", margin: "0 auto", width: "100%", padding: "60px 80px", gap: 64, alignItems: "center", position: "relative", zIndex: 1 }}>
+        {/* LEFT */}
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <R c="rs" d="d2" style={{ flex: "0 0 58%", position: "relative" }}>
-            <Ph label="Dashboard · Hero" num="01" style={{ height: "100%", width: "100%" }}>
-              {/* Data overlay */}
-              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "20px 24px", background: "linear-gradient(transparent, rgba(13,13,15,.92))", zIndex: 5, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                <div>
-                  <div className="mono" style={{ fontSize: 8, color: "var(--acid)", marginBottom: 4 }}>Revenue · Q2 2025</div>
-                  <div className="disp" style={{ fontSize: 32, color: "var(--cream)" }}>₹42.8L</div>
-                </div>
-                <svg width="80" height="32" viewBox="0 0 80 32">
-                  <polyline points="0,28 14,20 28,23 42,10 56,14 70,4 80,6" fill="none" stroke="var(--acid)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-                    style={{ strokeDasharray: 180, strokeDashoffset: 180, animation: "drawLine 2s ease .6s forwards" }}/>
-                </svg>
-              </div>
-            </Ph>
+          <R>
+            <div style={{ marginBottom: 28 }}>
+              <div className="badge"><span className="badge-dot" />Financial Intelligence Platform</div>
+            </div>
           </R>
-          <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1px 1fr", borderTop: "1px solid var(--b)" }}>
-            <R c="rs" d="d3" style={{ height: "100%" }}>
-              <Ph label="Tax Engine" num="02" style={{ height: "100%", minHeight: 160 }}>
-                <div style={{ position: "absolute", bottom: 14, left: 14, zIndex: 5, fontFamily: "'DM Mono',monospace", fontSize: 8, color: "var(--acid)", lineHeight: 1.7 }}>
-                  GST: ₹1.96L<br/>TDS: ₹84K<br/>Score: 84/100
+          <R c="r" d="d1">
+            <h1 className="display" style={{ fontSize: "clamp(48px,6vw,82px)", marginBottom: 24 }}>
+              Automates Your<br />
+              <span className="text-gradient">Taxes, Assets</span><br />
+              &amp; Cashflow.
+            </h1>
+          </R>
+          <R c="r" d="d2">
+            <p className="body-lg" style={{ maxWidth: 460, marginBottom: 36 }}>
+              Fynovo is the operating layer for your finances. It connects every rupee across platforms, computes your tax position in real time, and sends you AI-driven moves — before your CA does.
+            </p>
+          </R>
+
+          {/* Chips with staggered float */}
+          <R c="r" d="d3">
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 36 }}>
+              {[["₹4.2L", "Revenue today", "↑18.4%"], ["₹3.1L", "Net profit", "↑24.1%"], ["84/100", "Tax score", "Optimised"]].map(([v, l, d], i) => (
+                <div className="chip" key={l} style={{ animation: `float ${4 + i * 0.8}s ease-in-out infinite`, animationDelay: `${i * 0.5}s` }}>
+                  <div className="chip-v">{v}</div>
+                  <div className="chip-l">{l}</div>
+                  <div className="chip-d">{d}</div>
                 </div>
-              </Ph>
-            </R>
-            <div style={{ background: "var(--b)" }}/>
-            <R c="rs" d="d4" style={{ height: "100%" }}>
-              <Ph label="AI Advisor" num="03" style={{ height: "100%", minHeight: 160 }}>
-                <div style={{ position: "absolute", bottom: 14, left: 14, right: 14, zIndex: 5, fontFamily: "'DM Mono',monospace", fontSize: 8, color: "var(--acid)", lineHeight: 1.7 }}>
-                  &gt; Reallocate ₹18K<br/>&gt; Yield: +₹42K<span style={{ animation: "blink 1s step-end infinite" }}>_</span>
-                </div>
-              </Ph>
-            </R>
-          </div>
+              ))}
+            </div>
+          </R>
+
+          {/* CTAs */}
+          <R c="r" d="d4">
+            <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
+              <button className="btn btn-primary btn-lg">Start Free — ₹0</button>
+              <button className="btn btn-ghost">
+                <span style={{ width: 32, height: 32, borderRadius: "50%", border: "1.5px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "var(--primary)" }}>▷</span>
+                Watch 90s demo
+              </button>
+            </div>
+          </R>
         </div>
+
+        {/* RIGHT — rich dashboard mockup */}
+        <R c="rs" d="d2" style={{ height: "100%", minHeight: 500 }}>
+          <Ph label="Dashboard · Hero" num="01" type="dashboard" mockup={<HeroDashboard />} style={{ height: "100%", minHeight: 500 }}>
+            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "20px 24px", background: "linear-gradient(transparent, rgba(0,74,96,.92))", zIndex: 5, display: "flex", justifyContent: "space-between", alignItems: "flex-end", borderRadius: "0 0 var(--r-lg) var(--r-lg)" }}>
+              <div>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, color: "rgba(255,255,255,.55)", marginBottom: 4, letterSpacing: ".16em", textTransform: "uppercase" }}>Revenue · Q2 2025</div>
+                <div style={{ fontFamily: "var(--font-head)", fontWeight: 800, fontSize: 30, color: "#fff", letterSpacing: "-.03em" }}>₹42.8L</div>
+              </div>
+              <svg width="90" height="36" viewBox="0 0 90 36">
+                <polyline points="0,30 16,22 30,26 46,12 62,16 78,5 90,8"
+                  fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ strokeDasharray: 200, strokeDashoffset: 200, animation: "drawLine 2s ease .8s forwards" }} />
+              </svg>
+            </div>
+          </Ph>
+        </R>
       </div>
 
-      {/* Bottom city strip */}
-      <div style={{ borderTop: "1px solid var(--b)", padding: "12px 52px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, position: "relative", zIndex: 2 }}>
-        {["Mumbai","Bangalore","Delhi","Chennai","Hyderabad","Pune"].map(c => (
-          <span key={c} className="mono" style={{ fontSize: 8, color: "rgba(240,235,224,.25)" }}>{c}</span>
+      {/* City strip */}
+      <div className="city-strip" style={{ position: "relative", zIndex: 1 }}>
+        {["Mumbai", "Bangalore", "Delhi", "Chennai", "Hyderabad", "Pune"].map(c => (
+          <span key={c} className="city-name">{c}</span>
         ))}
-        <span className="mono" style={{ fontSize: 8, color: "var(--acid)" }}>● LIVE</span>
+        <span className="city-live">Live</span>
       </div>
     </section>
   );
 }
 
-/* Stats */
+/* ========================================================== STATS */
 function Stats() {
   const [ref, on] = useReveal(0.3);
   const [vals, setVals] = useState([0, 0, 0, 0]);
@@ -362,7 +311,11 @@ function Stats() {
     if (!on) return;
     tgts.forEach((t, i) => {
       let c = 0; const step = t / 55;
-      const id = setInterval(() => { c = Math.min(c + step, t); setVals(p => { const n = [...p]; n[i] = Math.round(c); return n; }); if (c >= t) clearInterval(id); }, 20);
+      const id = setInterval(() => {
+        c = Math.min(c + step, t);
+        setVals(p => { const n = [...p]; n[i] = Math.round(c); return n; });
+        if (c >= t) clearInterval(id);
+      }, 20);
     });
   }, [on]);
   const data = [
@@ -372,126 +325,122 @@ function Stats() {
     { pre: "₹", suf: "Cr", lbl: "Revenue processed\nthis year" },
   ];
   return (
-    <div ref={ref} style={{ borderTop: "1px solid var(--b)", borderBottom: "1px solid var(--b)", position: "relative", overflow: "hidden" }}>
-      <Scanline/>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)" }}>
-        {data.map(({ pre, suf, lbl }, i) => (
-          <div key={i} style={{ padding: "64px 52px", borderRight: i < 3 ? "1px solid var(--b)" : "none" }}>
-            <div className="sn">{pre}<em>{vals[i].toLocaleString()}</em>{suf}</div>
-            <div style={{ marginTop: 16, fontFamily: "'DM Mono',monospace", fontSize: 9, color: "var(--cream3)", letterSpacing: ".08em", lineHeight: 1.7, whiteSpace: "pre-line" }}>{lbl}</div>
-          </div>
-        ))}
+    <div ref={ref} className="stats-wrap">
+      <div style={{ maxWidth: "var(--max)", margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)" }}>
+          {data.map(({ pre, suf, lbl }, i) => (
+            <div key={i} style={{ padding: "72px 56px", borderRight: i < 3 ? "1px solid rgba(255,255,255,.1)" : "none" }}>
+              <div className="stats-n">{pre}<em>{vals[i].toLocaleString()}</em>{suf}</div>
+              <div className="stats-lbl">{lbl}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
-/* Features */
+/* ========================================================== FEATURES */
 const FEATS = [
-  { n:"01", t:"Smart Financial Dashboard", b:"Real-time P&L, balance sheet, and cashflow unified. Multi-source income from Shopify, banks, and manual entries — always current." },
-  { n:"02", t:"AI Financial Advisor", b:"Powered by Gemini & Groq LLaMA 3.3. Personalised savings tips, investment suggestions, and spending alerts — like a CFO in your pocket." },
-  { n:"03", t:"Automated Tax Engine", b:"GST, TDS, and Income Tax calculated in real-time. Tax Optimization Score surfaces legal savings you'd miss otherwise." },
-  { n:"04", t:"Intelligent Asset Management", b:"Gold, silver, equities, crypto tracked live with 5-year AI projections. Know what your assets will be worth in 2030." },
-  { n:"05", t:"SmartBorrow Strategy", b:"AI modelling of borrowing costs, loan structures, and repayment strategies. Minimise interest, maximise working capital." },
-  { n:"06", t:"Real-Time Notifications", b:"Socket.io-powered alerts for bills, transactions, market swings. The platform watches the numbers so you don't have to." },
+  { n: "01", t: "Smart Financial Dashboard", b: "Real-time P&L, balance sheet, and cashflow unified. Multi-source income from Shopify, banks, and manual entries — always current." },
+  { n: "02", t: "AI Financial Advisor", b: "Powered by Gemini & Groq LLaMA 3.3. Personalised savings tips, investment suggestions, and spending alerts — like a CFO in your pocket." },
+  { n: "03", t: "Automated Tax Engine", b: "GST, TDS, and Income Tax calculated in real-time. Tax Optimization Score surfaces legal savings you'd miss otherwise." },
+  { n: "04", t: "Intelligent Asset Management", b: "Gold, silver, equities, crypto tracked live with 5-year AI projections. Know what your assets will be worth in 2030." },
+  { n: "05", t: "SmartBorrow Strategy", b: "AI modelling of borrowing costs, loan structures, and repayment strategies. Minimise interest, maximise working capital." },
+  { n: "06", t: "Real-Time Notifications", b: "Socket.io-powered alerts for bills, transactions, market swings. The platform watches the numbers so you don't have to." },
 ];
 
 function Features() {
   return (
-    <section style={{ padding: "120px 52px", maxWidth: 1280, margin: "0 auto" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 88, alignItems: "start" }}>
-        <div>
-          <R c="r">
-            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
-              <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
-              <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Platform</span>
-            </div>
-          </R>
-          <R c="r" d="d1">
-            <h2 className="disp" style={{ fontSize: "clamp(40px,5vw,68px)", marginBottom: 24 }}>
-              Built for the<br/>way money<br/><em className="disp-i" style={{ color: "var(--acid)" }}>actually</em><br/>moves.
-            </h2>
-          </R>
-          <R c="r" d="d2">
-            <p style={{ fontSize: 14, color: "var(--cream3)", lineHeight: 1.8, maxWidth: 360, marginBottom: 44 }}>
-              Every feature is designed around the real financial pressures on Indian SMEs, freelancers, and digital entrepreneurs.
-            </p>
-          </R>
-          <R c="rs" d="d3">
-            <Ph label="Platform Overview" num="04" style={{ height: 320, width: "100%" }}/>
-          </R>
-          <R c="rs" d="d4" style={{ marginTop: 2 }}>
-            <Ph label="Mobile App View" num="05" style={{ height: 180, width: "100%" }}/>
-          </R>
-        </div>
-        <div>
-          {FEATS.map(({ n, t, b }, i) => (
-            <R key={n} c="r" d={`d${Math.min(i + 1, 6)}`}>
-              <div className="feat-row">
-                <div className="fn">{n}</div>
-                <div><div className="ft">{t}</div><div className="fb">{b}</div></div>
-                <div className="fa">→</div>
-              </div>
+    <section className="section">
+      <div className="container">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 88, alignItems: "start" }}>
+          <div>
+            <R c="r"><Eyebrow text="Platform" /></R>
+            <R c="r" d="d1">
+              <h2 className="display" style={{ fontSize: "clamp(36px,4.5vw,62px)", marginBottom: 20 }}>
+                Built for the way<br />money{" "}
+                <span className="text-gradient">actually</span><br />
+                moves.
+              </h2>
             </R>
-          ))}
+            <R c="r" d="d2">
+              <p className="body-md" style={{ maxWidth: 360, marginBottom: 40 }}>
+                Every feature is designed around the real financial pressures on Indian SMEs, freelancers, and digital entrepreneurs.
+              </p>
+            </R>
+            <R c="rs" d="d3">
+              <Ph label="Platform Overview" num="04" type="dashboard" style={{ height: 300, width: "100%", marginBottom: 12 }} />
+            </R>
+            <R c="rs" d="d4">
+              <Ph label="Mobile App View" num="05" type="phone" style={{ height: 180, width: "100%" }} />
+            </R>
+          </div>
+          <div style={{ paddingTop: 8 }}>
+            {FEATS.map(({ n, t, b }, i) => (
+              <R key={n} c="r" d={`d${Math.min(i + 1, 6)}`}>
+                <div className="feat-row">
+                  <div className="feat-n">{n}</div>
+                  <div><div className="feat-t">{t}</div><div className="feat-b">{b}</div></div>
+                  <div className="feat-a">→</div>
+                </div>
+              </R>
+            ))}
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-/* Showcase */
+/* ========================================================== SHOWCASE */
 function Showcase() {
   return (
-    <section style={{ padding: "120px 0 0" }}>
-      <div style={{ padding: "0 52px", maxWidth: 1280, margin: "0 auto 40px" }}>
+    <section className="section section-alt">
+      <div style={{ padding: "0 80px", maxWidth: "var(--max)", margin: "0 auto 48px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
           <R c="r">
-            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
-              <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
-              <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Product Screens</span>
-            </div>
-            <h2 className="disp" style={{ fontSize: "clamp(36px,4.5vw,60px)" }}>
-              See it in<br/><em className="disp-i" style={{ color: "var(--cream3)" }}>motion.</em>
+            <Eyebrow text="Product Screens" />
+            <h2 className="display" style={{ fontSize: "clamp(32px,4vw,54px)" }}>
+              See it in <span className="text-gradient">motion.</span>
             </h2>
           </R>
-          <R c="r" d="d2"><div className="tag">27 Screens</div></R>
+          <R c="r" d="d2"><div className="badge"><span className="badge-dot" />27 Screens</div></R>
         </div>
       </div>
-      {/* Full-bleed grids */}
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "360px 220px", gap: 2, marginBottom: 2 }}>
-        <R c="rs" d="d1" style={{ gridRow: "span 2", height: "100%" }}><Ph label="Full Dashboard · Wide" num="06" style={{ height: "100%", width: "100%" }}/></R>
-        <R c="rs" d="d2"><Ph label="Analytics View" num="07" style={{ height: "100%" }}/></R>
-        <R c="rs" d="d3"><Ph label="Tax Filing Screen" num="08" style={{ height: "100%" }}/></R>
-        <R c="rs" d="d4"><Ph label="Asset Portfolio" num="09" style={{ height: "100%" }}/></R>
-        <R c="rs" d="d5"><Ph label="AI Chat" num="10" style={{ height: "100%" }}/></R>
+      <div style={{ padding: "0 80px", maxWidth: "var(--max)", margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "340px 200px", gap: 12, marginBottom: 12 }}>
+          <R c="rs" d="d1" style={{ gridRow: "span 2" }}><Ph label="Full Dashboard" num="06" type="dashboard" style={{ height: "100%", width: "100%" }} /></R>
+          <R c="rs" d="d2"><Ph label="Analytics View" num="07" type="chart" style={{ height: "100%" }} /></R>
+          <R c="rs" d="d3"><Ph label="Tax Filing" num="08" type="doc" style={{ height: "100%" }} /></R>
+          <R c="rs" d="d4"><Ph label="Asset Portfolio" num="09" type="portfolio" style={{ height: "100%" }} /></R>
+          <R c="rs" d="d5"><Ph label="AI Chat" num="10" type="ai" style={{ height: "100%" }} /></R>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 12 }}>
+          {[["Invoice View","11","doc"],["Notifications","12","grid"],["Mobile App","13","phone"],["Settings","14","grid"]].map(([l,n,t]) => (
+            <R key={n} c="rs"><Ph label={l} num={n} type={t} style={{ height: 180 }} /></R>
+          ))}
+        </div>
+        <R c="rs"><Ph label="Onboarding Flow · Panorama" num="15" type="dashboard" style={{ height: 130, width: "100%" }} /></R>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 2, marginBottom: 2 }}>
-        {[["Invoice View","11"],["Notifications","12"],["Mobile App","13"],["Settings","14"]].map(([l, n]) => (
-          <R key={n} c="rs"><Ph label={l} num={n} style={{ height: 180 }}/></R>
-        ))}
-      </div>
-      <R c="rs"><Ph label="Onboarding Flow · Panorama" num="15" style={{ height: 140, width: "100%" }}/></R>
     </section>
   );
 }
 
-/* Deep Feature Split */
-function DeepFeat({ tag, h1, hItalic, body, checks, imgLabel, imgNum, reverse }) {
+/* ========================================================== DEEP FEATURE */
+function DeepFeat({ tag, h1, hBold, body, checks, imgLabel, imgNum, imgType = "chart", reverse }) {
   const text = (
     <R c={reverse ? "rr" : "rl"}>
-      <div className="tag" style={{ marginBottom: 28 }}>{tag}</div>
-      <h2 className="disp" style={{ fontSize: "clamp(32px,3.5vw,50px)", marginBottom: 24, lineHeight: 1.05 }}>
-        {h1}<br/><em className="disp-i" style={{ color: "var(--acid)" }}>{hItalic}</em>
+      <Eyebrow text={tag} />
+      <h2 className="display" style={{ fontSize: "clamp(30px,3.2vw,48px)", marginBottom: 20, lineHeight: 1.08 }}>
+        {h1}<br /><span className="text-gradient">{hBold}</span>
       </h2>
-      <p style={{ fontSize: 14, color: "var(--cream3)", lineHeight: 1.8, marginBottom: 36 }}>{body}</p>
+      <p className="body-md" style={{ marginBottom: 32 }}>{body}</p>
       <div>
         {checks.map((c, i) => (
-          <div key={i} style={{ display: "flex", gap: 16, padding: "16px 0", borderBottom: "1px solid var(--b)", alignItems: "flex-start" }}>
-            <div style={{ width: 18, height: 18, border: "1px solid var(--acid)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
-              <div style={{ width: 6, height: 6, background: "var(--acid)" }}/>
-            </div>
-            <span style={{ fontSize: 13, color: "var(--cream2)", lineHeight: 1.65 }}>{c}</span>
+          <div key={i} className="check-item">
+            <div className="check-box">✓</div>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--text-2)", lineHeight: 1.65 }}>{c}</span>
           </div>
         ))}
       </div>
@@ -499,85 +448,70 @@ function DeepFeat({ tag, h1, hItalic, body, checks, imgLabel, imgNum, reverse })
   );
   const img = (
     <R c={reverse ? "rl" : "rr"}>
-      <Ph label={imgLabel} num={imgNum} style={{ height: 460, width: "100%", marginBottom: 2 }}>
+      <Ph label={imgLabel} num={imgNum} type={imgType} style={{ height: 420, width: "100%", marginBottom: 12 }}>
         <div style={{ position: "absolute", top: 20, left: 20, zIndex: 5 }}>
-          <div className="tag">{tag}</div>
+          <div className="badge"><span className="badge-dot" />{tag}</div>
         </div>
       </Ph>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-        <Ph label={`${imgLabel} · Detail`} num={`${imgNum}A`} style={{ height: 140 }}/>
-        <Ph label={`${imgLabel} · Mobile`} num={`${imgNum}B`} style={{ height: 140 }}/>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <Ph label={`${imgLabel} · Detail`} num={`${imgNum}A`} type={imgType} style={{ height: 130 }} />
+        <Ph label={`${imgLabel} · Mobile`} num={`${imgNum}B`} type="phone" style={{ height: 130 }} />
       </div>
     </R>
   );
   return (
-    <div style={{ padding: "120px 52px", borderTop: "1px solid var(--b)" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "start" }}>
-        {reverse ? <>{img}{text}</> : <>{text}{img}</>}
+    <section className="section" style={{ borderTop: "1px solid var(--border-light)" }}>
+      <div className="container">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "start" }}>
+          {reverse ? <>{img}{text}</> : <>{text}{img}</>}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 
-/* Pricing */
+/* ========================================================== PRICING */
 function Pricing() {
+  const plans = [
+    { name: "Starter", price: "499", per: "per month / billed annually", feats: ["Single income source","Basic expense tracking","1 GB data storage","Email support"], btnClass: "btn-outline", btnText: "Get Started" },
+    { name: "Professional", price: "1,499", per: "per month / billed annually", feats: ["Unlimited income sources","AI Financial Advisor","Full Tax Engine (GST/TDS)","5-year asset projections","SmartBorrow strategy"], btnClass: "btn-primary", btnText: "Start Free Trial", featured: true },
+    { name: "Enterprise", price: null, per: "Contact for a custom quote", feats: ["Multi-tenant architecture","Custom API integrations","Dedicated account manager","Advanced audit trails","SLA guarantee"], btnClass: "btn-ghost", btnText: "Contact Sales" },
+  ];
   return (
-    <section id="pricing" style={{ padding: "120px 52px", borderTop: "1px solid var(--b)" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+    <section id="pricing" className="section" style={{ borderTop: "1px solid var(--border-light)" }}>
+      <div className="container">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 60 }}>
           <div>
-            <R c="r">
-              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
-                <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
-                <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Pricing</span>
-              </div>
-            </R>
+            <R c="r"><Eyebrow text="Pricing" /></R>
             <R c="r" d="d1">
-              <h2 className="disp" style={{ fontSize: "clamp(36px,4.5vw,64px)" }}>
-                One price.<br/><em className="disp-i" style={{ color: "var(--acid)" }}>No surprises.</em>
+              <h2 className="display" style={{ fontSize: "clamp(32px,4vw,58px)" }}>
+                One price.<br /><span className="text-gradient">No surprises.</span>
               </h2>
             </R>
           </div>
           <R c="r" d="d2">
-            <p style={{ fontSize: 13, color: "var(--cream3)", maxWidth: 280, lineHeight: 1.75 }}>
-              Start free, scale when ready. Every plan includes the full security stack.
-            </p>
+            <p className="body-md" style={{ maxWidth: 280 }}>Start free, scale when ready. Every plan includes the full security stack.</p>
           </R>
         </div>
-
-        {/* Pricing visual */}
-        <R c="rs" d="d2" style={{ marginBottom: 2 }}>
-          <Ph label="Pricing · Feature Comparison" num="18" style={{ height: 100, width: "100%" }}/>
-        </R>
-
         <R c="rs" d="d3">
-          <div className="pt">
-            <div className="pc">
-              <div className="pn">Starter Plan</div>
-              <div className="pamt"><em>₹</em>499</div>
-              <div className="pper">Per month / billed annually</div>
-              {["Single income source","Basic expense tracking","1 GB data storage","Email support"].map(f=><div className="pf" key={f}>{f}</div>)}
-              <button className="pbtn o">Get Started</button>
-            </div>
-            <div className="pd"/>
-            <div className="pc hot">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div className="pn">Professional</div>
-                <div className="tag" style={{ fontSize: 8 }}>Popular</div>
+          <div className="price-grid">
+            {plans.map(({ name, price, per, feats, btnClass, btnText, featured }) => (
+              <div key={name} className={`price-card${featured ? " featured" : ""}`}>
+                {featured && <div className="price-popular">Most Popular</div>}
+                <div className="price-name">{name} Plan</div>
+                {price ? (
+                  <><div className="price-amount"><em>₹</em>{price}</div><div className="price-per">{per}</div></>
+                ) : (
+                  <><div className="price-amount custom">Custom</div><div className="price-per">{per}</div></>
+                )}
+                <div style={{ marginBottom: 8 }}>
+                  {feats.map(f => (
+                    <div key={f} className="price-feat"><div className="price-check">✓</div>{f}</div>
+                  ))}
+                </div>
+                <button className={`btn ${btnClass} btn-full`} style={{ marginTop: 28 }}>{btnText}</button>
               </div>
-              <div className="pamt"><em>₹</em>1,499</div>
-              <div className="pper">Per month / billed annually</div>
-              {["Unlimited income sources","AI Financial Advisor","Full Tax Engine (GST/TDS)","5-year asset projections","SmartBorrow strategy"].map(f=><div className="pf" key={f}>{f}</div>)}
-              <button className="pbtn a">Start Free Trial</button>
-            </div>
-            <div className="pd"/>
-            <div className="pc">
-              <div className="pn">Enterprise</div>
-              <div className="pamt" style={{ fontSize: 40 }}>Custom</div>
-              <div className="pper">Contact for quote</div>
-              {["Multi-tenant architecture","Custom API integrations","Dedicated account manager","Advanced audit trails","SLA guarantee"].map(f=><div className="pf" key={f}>{f}</div>)}
-              <button className="pbtn s">Contact Sales</button>
-            </div>
+            ))}
           </div>
         </R>
       </div>
@@ -585,49 +519,46 @@ function Pricing() {
   );
 }
 
-/* Testimonials */
+/* ========================================================== TESTIMONIALS */
 const TESTIS = [
-  { q:"Fynovo made our quarterly close 4× faster. The AI advisor flagged a ₹2L GST saving we'd have completely missed.", name:"Rahul Krishnan", role:"Founder · D2C Brand, Chennai", init:"RK" },
-  { q:"I connected Shopify on Monday. By Tuesday every order was categorised, GST computed, and I had a P&L.", name:"Priya Sharma", role:"E-commerce Seller · Bangalore", init:"PS" },
-  { q:"The 5-year asset projection is frighteningly accurate. Within 4% of actual.", name:"Arjun Mehta", role:"Angel Investor · Mumbai", init:"AM" },
-  { q:"We cut our CA fees by 60% because Fynovo handles everything our CA used to do manually.", name:"Sneha Iyer", role:"CFO · EdTech Startup, Pune", init:"SI" },
-  { q:"SmartBorrow restructured our working capital and saved ₹8L in interest. ROI in month one.", name:"Vikram Nair", role:"SME Owner · Delhi", init:"VN" },
-  { q:"As a freelancer managing 5 clients, the multi-source income view is the only way I stay sane.", name:"Deepa Rao", role:"Consultant · Hyderabad", init:"DR" },
+  { q: "Fynovo made our quarterly close 4× faster. The AI advisor flagged a ₹2L GST saving we'd have completely missed.", name: "Rahul Krishnan", role: "Founder · D2C Brand, Chennai", init: "RK" },
+  { q: "I connected Shopify on Monday. By Tuesday every order was categorised, GST computed, and I had a P&L.", name: "Priya Sharma", role: "E-commerce Seller · Bangalore", init: "PS" },
+  { q: "The 5-year asset projection is frighteningly accurate. Within 4% of actual.", name: "Arjun Mehta", role: "Angel Investor · Mumbai", init: "AM" },
+  { q: "We cut our CA fees by 60% because Fynovo handles everything our CA used to do manually.", name: "Sneha Iyer", role: "CFO · EdTech Startup, Pune", init: "SI" },
+  { q: "SmartBorrow restructured our working capital and saved ₹8L in interest. ROI in month one.", name: "Vikram Nair", role: "SME Owner · Delhi", init: "VN" },
+  { q: "As a freelancer managing 5 clients, the multi-source income view is the only way I stay sane.", name: "Deepa Rao", role: "Consultant · Hyderabad", init: "DR" },
 ];
 
 function Testimonials() {
   return (
-    <section style={{ padding: "120px 52px", borderTop: "1px solid var(--b)" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 88, alignItems: "start" }}>
-          <div style={{ position: "sticky", top: 96 }}>
-            <R c="r">
-              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
-                <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
-                <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Customers</span>
-              </div>
-            </R>
+    <section className="section section-alt" style={{ borderTop: "1px solid var(--border-light)" }}>
+      <div className="container">
+        <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 80, alignItems: "start" }}>
+          <div style={{ position: "sticky", top: 88 }}>
+            <R c="r"><Eyebrow text="Customers" /></R>
             <R c="r" d="d1">
-              <h2 className="disp" style={{ fontSize: "clamp(32px,3vw,52px)", marginBottom: 20 }}>
-                What they<br/><em className="disp-i" style={{ color: "var(--acid)" }}>said.</em>
+              <h2 className="display" style={{ fontSize: "clamp(28px,3vw,48px)", marginBottom: 16 }}>
+                What they<br /><span className="text-gradient">said.</span>
               </h2>
             </R>
             <R c="r" d="d2">
-              <p style={{ fontSize: 13, color: "var(--cream3)", lineHeight: 1.75 }}>From solo freelancers to Series A teams.</p>
+              <p className="body-sm" style={{ marginBottom: 28 }}>From solo freelancers to Series A teams.</p>
             </R>
-            <R c="rs" d="d3" style={{ marginTop: 36 }}><Ph label="Customer Photo" num="19" style={{ height: 200, width: "100%" }}/></R>
-            <R c="rs" d="d4" style={{ marginTop: 2 }}><Ph label="Team Office" num="20" style={{ height: 140, width: "100%" }}/></R>
+            <R c="rs" d="d3"><Ph label="Customer Photo" num="19" type="grid" style={{ height: 200, width: "100%", marginBottom: 12 }} /></R>
+            <R c="rs" d="d4"><Ph label="Team Office" num="20" type="grid" style={{ height: 140, width: "100%" }} /></R>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             {TESTIS.map(({ q, name, role, init }, i) => (
               <R key={name} c="r" d={`d${(i % 3) + 1}`}>
-                <div className="tc" style={{ height: "100%" }}>
-                  <p style={{ fontSize: 14, color: "var(--cream2)", lineHeight: 1.78, marginBottom: 28, fontStyle: "italic", fontFamily: "'Playfair Display',serif", position: "relative", zIndex: 1 }}>"{q}"</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, borderTop: "1px solid var(--b)", paddingTop: 20 }}>
-                    <div style={{ width: 34, height: 34, border: "1px solid var(--b2)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Mono',monospace", fontSize: 10, color: "var(--acid)" }}>{init}</div>
+                <div className="testi-card">
+                  <div className="testi-mark">"</div>
+                  <p className="testi-text">"{q}"</p>
+                  <div className="testi-divider" />
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div className="testi-avatar">{init}</div>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 13, color: "var(--cream)" }}>{name}</div>
-                      <div style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, color: "var(--cream3)", letterSpacing: ".05em" }}>{role}</div>
+                      <div className="testi-name">{name}</div>
+                      <div className="testi-role">{role}</div>
                     </div>
                   </div>
                 </div>
@@ -640,85 +571,85 @@ function Testimonials() {
   );
 }
 
-/* Integrations */
+/* ========================================================== INTEGRATIONS */
 const INTS = [
-  ["Shopify","21"],["WooCommerce","22"],["Razorpay","23"],["Stripe","24"],
-  ["Google Gemini","25"],["Groq LLaMA","26"],["BSE / NSE","27"],["Google OAuth","28"],
+  ["Shopify","21","grid"],["WooCommerce","22","grid"],["Razorpay","23","grid"],["Stripe","24","grid"],
+  ["Google Gemini","25","ai"],["Groq LLaMA","26","ai"],["BSE / NSE","27","chart"],["Google OAuth","28","grid"],
 ];
 
 function Integrations() {
   return (
-    <section id="integrations" style={{ padding: "120px 52px", borderTop: "1px solid var(--b)" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 88, alignItems: "start", marginBottom: 60 }}>
+    <section id="integrations" className="section" style={{ borderTop: "1px solid var(--border-light)" }}>
+      <div className="container">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 88, alignItems: "start", marginBottom: 56 }}>
           <div>
-            <R c="r">
-              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
-                <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
-                <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Integrations</span>
-              </div>
-            </R>
+            <R c="r"><Eyebrow text="Integrations" /></R>
             <R c="r" d="d1">
-              <h2 className="disp" style={{ fontSize: "clamp(32px,3.5vw,52px)", marginBottom: 20 }}>
-                Plugs into<br/><em className="disp-i" style={{ color: "var(--acid)" }}>everything</em><br/>you use.
+              <h2 className="display" style={{ fontSize: "clamp(28px,3.5vw,50px)", marginBottom: 16 }}>
+                Plugs into <span className="text-gradient">everything</span><br />you use.
               </h2>
             </R>
           </div>
-          <R c="r" d="d2" style={{ paddingTop: 20 }}>
-            <p style={{ fontSize: 14, color: "var(--cream3)", lineHeight: 1.8, marginBottom: 28 }}>
+          <R c="r" d="d2" style={{ paddingTop: 16 }}>
+            <p className="body-md" style={{ marginBottom: 24 }}>
               Connect e-commerce stores, payment gateways, and banking in minutes. Data flows in automatically — you never export a CSV again.
             </p>
-            <Ph label="Integration Map" num="29" style={{ height: 180, width: "100%" }}/>
+            <Ph label="Integration Map" num="29" type="grid" style={{ height: 160, width: "100%" }} />
           </R>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", border: "1px solid var(--b)" }}>
-          {INTS.map(([name, n], i) => (
-            <R key={name} c="r" d={`d${(i % 4) + 1}`}>
-              <div className="ii" style={{ borderRight: (i % 4) < 3 ? "1px solid var(--b)" : "none", borderBottom: i < 4 ? "1px solid var(--b)" : "none" }}>
-                <Ph label={name} num={n} style={{ width: 64, height: 64 }}/>
-                <div className="in">{name}</div>
+        <R c="rs">
+          <div className="int-grid">
+            {INTS.map(([name, n, type]) => (
+              <div key={name} className="int-item">
+                <Ph label={name} num={n} type={type} style={{ width: 68, height: 68 }} />
+                <div className="int-name">{name}</div>
               </div>
-            </R>
-          ))}
-        </div>
+            ))}
+          </div>
+        </R>
       </div>
     </section>
   );
 }
 
-/* CTA */
+/* ========================================================== CTA */
 function CTA() {
   return (
-    <section style={{ padding: "140px 52px", borderTop: "1px solid var(--b)", position: "relative", overflow: "hidden", background: "linear-gradient(170deg, var(--ink2) 0%, var(--ink) 60%)" }}>
-      <Scanline/>
-      <div style={{ position: "absolute", bottom: -60, left: -40, fontFamily: "'Playfair Display',serif", fontWeight: 900, fontSize: "clamp(120px,18vw,240px)", lineHeight: 1, color: "rgba(200,242,58,.025)", pointerEvents: "none", userSelect: "none", letterSpacing: "-.05em" }}>FYNOVO</div>
-      <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative", zIndex: 1 }}>
+    <section className="cta-grad" style={{ padding: "120px 0", borderTop: "1px solid rgba(255,255,255,.1)" }}>
+      <div className="container" style={{ position: "relative", zIndex: 1 }}>
+        {/* Decorative text */}
+        <div style={{ position: "absolute", bottom: -60, left: -20, fontFamily: "var(--font-head)", fontWeight: 800, fontSize: "clamp(100px,16vw,220px)", lineHeight: 1, color: "rgba(255,255,255,.035)", pointerEvents: "none", userSelect: "none", letterSpacing: "-.05em" }}>FYNOVO</div>
+
         <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 88, alignItems: "center" }}>
           <div>
             <R c="r">
-              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 32 }}>
-                <div style={{ width: 28, height: 1, background: "var(--acid)" }}/>
-                <span className="mono" style={{ fontSize: 10, color: "var(--acid)" }}>Get Started</span>
+              <div style={{ marginBottom: 28 }}>
+                <div className="badge badge-green"><span className="badge-dot" />Get Started Today</div>
               </div>
             </R>
             <R c="r" d="d1">
-              <h2 className="disp" style={{ fontSize: "clamp(44px,6.5vw,84px)", marginBottom: 32 }}>
-                Your finances,<br/><em className="disp-i" style={{ color: "var(--acid)" }}>finally</em><br/>under control.
+              <h2 className="display" style={{ fontSize: "clamp(36px,5.5vw,74px)", color: "#fff", marginBottom: 28 }}>
+                Your finances,<br />
+                <em style={{ fontStyle: "italic", color: "rgba(255,255,255,.6)" }}>finally</em><br />
+                under control.
               </h2>
             </R>
             <R c="r" d="d2">
-              <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
-                <button className="cta-btn" style={{ padding: "15px 44px", fontSize: 11 }}>Open Free Account</button>
-                <span className="mono" style={{ fontSize: 9, color: "var(--cream3)" }}>No card required</span>
+              <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
+                <button className="btn btn-white btn-lg">Open Free Account</button>
+                <button className="btn btn-white-outline btn-lg">See Pricing</button>
               </div>
+              <p style={{ marginTop: 16, fontFamily: "var(--font-mono)", fontSize: 10, color: "rgba(255,255,255,.38)", letterSpacing: ".12em", textTransform: "uppercase" }}>
+                No card required · Cancel anytime
+              </p>
             </R>
           </div>
           <R c="rs" d="d3">
-            <Ph label="CTA Visual" num="30" style={{ height: 300, width: "100%" }}>
-              <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 28 }}>
-                <div className="tag" style={{ marginBottom: 14, alignSelf: "flex-start" }}>Live platform</div>
-                <div className="mono" style={{ fontSize: 8, color: "var(--cream3)", lineHeight: 1.9 }}>
-                  ₹0 setup · Cancel anytime<br/>GST + TDS + Income Tax<br/>Shopify · Banks · WooCommerce
+            <Ph label="CTA Visual" num="30" type="dashboard" style={{ height: 320, width: "100%", background: "linear-gradient(145deg,rgba(0,74,96,.8),rgba(0,95,122,.4))", border: "1px solid rgba(255,255,255,.15)" }}>
+              <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 28, borderRadius: "var(--r-lg)" }}>
+                <div className="badge badge-green" style={{ marginBottom: 12, alignSelf: "flex-start" }}><span className="badge-dot" />Live platform</div>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "rgba(255,255,255,.45)", lineHeight: 1.9, letterSpacing: ".08em", textTransform: "uppercase" }}>
+                  ₹0 setup · Cancel anytime<br />GST + TDS + Income Tax<br />Shopify · Banks · WooCommerce
                 </div>
               </div>
             </Ph>
@@ -729,63 +660,53 @@ function CTA() {
   );
 }
 
-/* Footer */
+/* ========================================================== FOOTER */
 function Footer() {
   const cols = [
     { h: "Company", links: ["About","Journal","Careers","Press"] },
-    { h: "Product", links: ["Features","Pricing","Integrations","Changelog"] },
-    { h: "Resources", links: ["Documentation","API Docs","Help Centre","Status"] },
-    { h: "Legal", links: ["Privacy Policy","Terms","Cookies","Compliance"] },
+    { h: "Product",  links: ["Features","Pricing","Integrations","Changelog"] },
+    { h: "Resources",links: ["Documentation","API Docs","Help Centre","Status"] },
+    { h: "Legal",    links: ["Privacy Policy","Terms","Cookies","Compliance"] },
   ];
   return (
-    <footer style={{ borderTop: "1px solid var(--b)", padding: "52px 52px 40px" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 0, marginBottom: 52, borderBottom: "1px solid var(--b)", paddingBottom: 52 }}>
+    <footer className="footer">
+      <div className="container">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", padding: "64px 0 52px", borderBottom: "1px solid rgba(255,255,255,.08)" }}>
           {cols.map(({ h, links }, i) => (
-            <div key={h} style={{ padding: "0 40px", borderRight: i < 3 ? "1px solid var(--b)" : "none" }}>
-              <div className="mono" style={{ fontSize: 9, color: "var(--cream3)", marginBottom: 20 }}>{h}</div>
-              {links.map(l => (
-                <a key={l} href="#" style={{ display: "block", fontSize: 13, color: "var(--cream3)", textDecoration: "none", marginBottom: 12, transition: "color .2s" }}
-                  onMouseEnter={e => e.currentTarget.style.color = "var(--cream)"}
-                  onMouseLeave={e => e.currentTarget.style.color = "var(--cream3)"}>{l}</a>
-              ))}
+            <div key={h} style={{ padding: "0 40px", borderRight: i < 3 ? "1px solid rgba(255,255,255,.08)" : "none" }}>
+              <div className="footer-head">{h}</div>
+              {links.map(l => <a key={l} href="#" className="footer-link">{l}</a>)}
             </div>
           ))}
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <a href="#" className="logo" style={{ fontSize: 20 }}>Fy<em>novo</em></a>
-          <span className="mono" style={{ fontSize: 8, color: "rgba(240,235,224,.25)" }}>© 2025 FYNOVO TECHNOLOGIES PVT. LTD. — ALL RIGHTS RESERVED</span>
-          <div className="tag" style={{ fontSize: 8 }}>Made in India</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "28px 0" }}>
+          <a href="#" className="footer-logo">Fy<em>novo</em></a>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "rgba(255,255,255,.2)", letterSpacing: ".1em", textTransform: "uppercase" }}>
+            © 2025 Fynovo Technologies Pvt. Ltd. — All Rights Reserved
+          </span>
+          <div className="badge badge-green" style={{ fontSize: 9 }}><span className="badge-dot" />Made in India</div>
         </div>
       </div>
     </footer>
   );
 }
 
-/* Root */
+/* ========================================================== ROOT */
 export default function App() {
-  useEffect(() => {
-    if (!document.getElementById("fy-g")) {
-      const s = document.createElement("style");
-      s.id = "fy-g"; s.textContent = G;
-      document.head.appendChild(s);
-    }
-  }, []);
   return (
     <>
-      <Cursor/>
-      <Nav/>
-      <Hero/>
-      <Stats/>
-      <Features/>
-      <Showcase/>
-      <DeepFeat tag="Tax Automation" h1="Never miss a" hItalic="tax liability." body="The real-time tax engine tracks GST, TDS, and Income Tax across every transaction. Your Tax Optimization Score surfaces legal savings — every month, automatically." checks={["Auto GST across all business transactions","Income tax slab tracking with cess","TDS management for freelancers & SMEs","Personalised Tax Optimization Score"]} imgLabel="Tax Engine Screen" imgNum="16" />
-      <DeepFeat reverse tag="Asset Intelligence" h1="5-year projections," hItalic="live markets." body="Gold, silver, equities, crypto — every asset tracked with AI forecasts built on real Indian market data. Know what your portfolio is worth today, and in 2030." checks={["Physical: Gold & Silver via live CME","Equities via BSE/NSE real-time feeds","Crypto portfolio with rebalancing alerts","Confidence-interval 5-year projections"]} imgLabel="Portfolio Screen" imgNum="17" />
-      <Pricing/>
-      <Testimonials/>
-      <Integrations/>
-      <CTA/>
-      <Footer/>
+      <Nav />
+      <Hero />
+      <Stats />
+      <Features />
+      <Showcase />
+      <DeepFeat tag="Tax Automation" h1="Never miss a" hBold="tax liability." body="The real-time tax engine tracks GST, TDS, and Income Tax across every transaction. Your Tax Optimization Score surfaces legal savings — every month, automatically." checks={["Auto GST across all business transactions","Income tax slab tracking with cess","TDS management for freelancers & SMEs","Personalised Tax Optimization Score"]} imgLabel="Tax Engine Screen" imgNum="16" imgType="doc" />
+      <DeepFeat reverse tag="Asset Intelligence" h1="5-year projections," hBold="live markets." body="Gold, silver, equities, crypto — every asset tracked with AI forecasts built on real Indian market data. Know what your portfolio is worth today, and in 2030." checks={["Physical: Gold & Silver via live CME","Equities via BSE/NSE real-time feeds","Crypto portfolio with rebalancing alerts","Confidence-interval 5-year projections"]} imgLabel="Portfolio Screen" imgNum="17" imgType="portfolio" />
+      <Pricing />
+      <Testimonials />
+      <Integrations />
+      <CTA />
+      <Footer />
     </>
   );
 }
