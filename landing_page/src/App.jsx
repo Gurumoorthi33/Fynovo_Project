@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import "./index.css";
 
 /* ============================================================
@@ -186,24 +186,44 @@ function Eyebrow({ text }) {
   );
 }
 
-/* ========================================================== NAV */
+/* ========================================================== NAV - FIXED MOBILE */
 function Nav() {
   const [s, setS] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
   useEffect(() => {
     const fn = () => setS(window.scrollY > 40);
     window.addEventListener("scroll", fn);
     return () => window.removeEventListener("scroll", fn);
   }, []);
+
+  const toggleMenu = useCallback(() => setIsOpen(open => !open), []);
+
   return (
-    <nav className={`nav${s ? " s" : ""}`}>
-      <a href="#" className="nav-logo">Fy<em>novo</em></a>
-      <ul className="nav-links">
-        {["Platform", "Pricing", "Integrations", "Journal"].map(l => (
-          <li key={l}><a href="#">{l}</a></li>
-        ))}
-      </ul>
-      <button className="btn btn-primary">Open Account →</button>
-    </nav>
+    <>
+      <nav className={`nav${s ? " s" : ""}`}>
+        <a href="#hero" className="nav-logo">Fy<em>novo</em></a>
+        <ul className={`nav-links${isOpen ? " open" : ""}`}>
+          {["Platform", "Pricing", "Integrations", "Journal"].map(l => (
+            <li key={l}><a href={`#${l.toLowerCase()}`} onClick={toggleMenu}>{l}</a></li>
+          ))}
+        </ul>
+        <button className="btn btn-primary btn-sm d-none-desktop ripple glow-hover">Open Account →</button>
+        <button className="hamburger" onClick={toggleMenu} aria-label="Toggle Menu" aria-expanded={isOpen}>
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+      {isOpen && (
+        <div className="mobile-menu-overlay" onClick={toggleMenu}>
+          <div className="mobile-menu">
+            {["Platform", "Pricing", "Integrations", "Journal"].map(l => (
+              <a key={l} href={`#${l.toLowerCase()}`} className="mobile-link" onClick={toggleMenu}>{l}</a>
+            ))}
+            <button className="btn btn-primary btn-full ripple glow-hover">Open Account →</button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
