@@ -208,18 +208,24 @@ function Nav() {
             <li key={l}><a href={`#${l.toLowerCase()}`} onClick={toggleMenu}>{l}</a></li>
           ))}
         </ul>
-        <button className="btn btn-primary btn-sm d-none-desktop ripple glow-hover">Open Account →</button>
+        <button className="btn btn-primary btn-sm d-none-mobile ripple glow-hover">Open Account →</button>
         <button className="hamburger" onClick={toggleMenu} aria-label="Toggle Menu" aria-expanded={isOpen}>
           <span></span><span></span><span></span>
         </button>
       </nav>
       {isOpen && (
         <div className="mobile-menu-overlay" onClick={toggleMenu}>
-          <div className="mobile-menu">
+          <div className="mobile-menu" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-menu-head">
+              <span className="nav-logo">Fy<em>novo</em></span>
+              <button className="hamburger" onClick={toggleMenu} aria-expanded="true">
+                <span></span><span></span><span></span>
+              </button>
+            </div>
             {["Platform", "Pricing", "Integrations", "Journal"].map(l => (
               <a key={l} href={`#${l.toLowerCase()}`} className="mobile-link" onClick={toggleMenu}>{l}</a>
             ))}
-            <button className="btn btn-primary btn-full ripple glow-hover">Open Account →</button>
+            <button className="btn btn-primary btn-full ripple glow-hover" style={{ marginTop: 20 }}>Open Account →</button>
           </div>
         </div>
       )}
@@ -247,7 +253,7 @@ function Hero() {
       </div>
 
       {/* Main grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 540px", flex: 1, maxWidth: "var(--max)", margin: "0 auto", width: "100%", padding: "60px 80px", gap: 64, alignItems: "center", position: "relative", zIndex: 1 }}>
+      <div className="hero-grid container" style={{ flex: 1, margin: "0 auto", width: "100%", position: "relative", zIndex: 1 }}>
         {/* LEFT */}
         <div style={{ display: "flex", flexDirection: "column" }}>
           <R>
@@ -346,10 +352,10 @@ function Stats() {
   ];
   return (
     <div ref={ref} className="stats-wrap">
-      <div style={{ maxWidth: "var(--max)", margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)" }}>
+      <div className="container">
+        <div className="stats-grid">
           {data.map(({ pre, suf, lbl }, i) => (
-            <div key={i} style={{ padding: "72px 56px", borderRight: i < 3 ? "1px solid rgba(255,255,255,.1)" : "none" }}>
+            <div key={i} className="stat-item" style={{ borderRight: i < 3 ? "1px solid rgba(255,255,255,.1)" : "none" }}>
               <div className="stats-n">{pre}<em>{vals[i].toLocaleString()}</em>{suf}</div>
               <div className="stats-lbl">{lbl}</div>
             </div>
@@ -374,7 +380,7 @@ function Features() {
   return (
     <section className="section">
       <div className="container">
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 88, alignItems: "start" }}>
+        <div className="feat-grid">
           <div>
             <R c="r"><Eyebrow text="Platform" /></R>
             <R c="r" d="d1">
@@ -417,8 +423,8 @@ function Features() {
 function Showcase() {
   return (
     <section className="section section-alt">
-      <div style={{ padding: "0 80px", maxWidth: "var(--max)", margin: "0 auto 48px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+      <div className="container show-head" style={{ marginBottom: 48 }}>
+        <div className="show-head-inner">
           <R c="r">
             <Eyebrow text="Product Screens" />
             <h2 className="display" style={{ fontSize: "clamp(32px,4vw,54px)" }}>
@@ -428,15 +434,15 @@ function Showcase() {
           <R c="r" d="d2"><div className="badge"><span className="badge-dot" />27 Screens</div></R>
         </div>
       </div>
-      <div style={{ padding: "0 80px", maxWidth: "var(--max)", margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "340px 200px", gap: 12, marginBottom: 12 }}>
-          <R c="rs" d="d1" style={{ gridRow: "span 2" }}><Ph label="Full Dashboard" num="06" type="dashboard" style={{ height: "100%", width: "100%" }} /></R>
+      <div className="container">
+        <div className="show-grid-1">
+          <R c="rs" d="d1" className="span-2"><Ph label="Full Dashboard" num="06" type="dashboard" style={{ height: "100%", width: "100%" }} /></R>
           <R c="rs" d="d2"><Ph label="Analytics View" num="07" type="chart" style={{ height: "100%" }} /></R>
           <R c="rs" d="d3"><Ph label="Tax Filing" num="08" type="doc" style={{ height: "100%" }} /></R>
           <R c="rs" d="d4"><Ph label="Asset Portfolio" num="09" type="portfolio" style={{ height: "100%" }} /></R>
           <R c="rs" d="d5"><Ph label="AI Chat" num="10" type="ai" style={{ height: "100%" }} /></R>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 12 }}>
+        <div className="show-grid-2">
           {[["Invoice View","11","doc"],["Notifications","12","grid"],["Mobile App","13","phone"],["Settings","14","grid"]].map(([l,n,t]) => (
             <R key={n} c="rs"><Ph label={l} num={n} type={t} style={{ height: 180 }} /></R>
           ))}
@@ -482,7 +488,7 @@ function DeepFeat({ tag, h1, hBold, body, checks, imgLabel, imgNum, imgType = "c
   return (
     <section className="section" style={{ borderTop: "1px solid var(--border-light)" }}>
       <div className="container">
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "start" }}>
+        <div className="deep-grid">
           {reverse ? <>{img}{text}</> : <>{text}{img}</>}
         </div>
       </div>
@@ -500,7 +506,7 @@ function Pricing() {
   return (
     <section id="pricing" className="section" style={{ borderTop: "1px solid var(--border-light)" }}>
       <div className="container">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 60 }}>
+        <div className="price-head">
           <div>
             <R c="r"><Eyebrow text="Pricing" /></R>
             <R c="r" d="d1">
@@ -553,7 +559,7 @@ function Testimonials() {
   return (
     <section className="section section-alt" style={{ borderTop: "1px solid var(--border-light)" }}>
       <div className="container">
-        <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 80, alignItems: "start" }}>
+        <div className="testi-grid-main">
           <div style={{ position: "sticky", top: 88 }}>
             <R c="r"><Eyebrow text="Customers" /></R>
             <R c="r" d="d1">
@@ -567,7 +573,7 @@ function Testimonials() {
             <R c="rs" d="d3"><Ph label="Customer Photo" num="19" type="grid" style={{ height: 200, width: "100%", marginBottom: 12 }} /></R>
             <R c="rs" d="d4"><Ph label="Team Office" num="20" type="grid" style={{ height: 140, width: "100%" }} /></R>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div className="testi-grid-sub">
             {TESTIS.map(({ q, name, role, init }, i) => (
               <R key={name} c="r" d={`d${(i % 3) + 1}`}>
                 <div className="testi-card">
@@ -601,7 +607,7 @@ function Integrations() {
   return (
     <section id="integrations" className="section" style={{ borderTop: "1px solid var(--border-light)" }}>
       <div className="container">
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 88, alignItems: "start", marginBottom: 56 }}>
+        <div className="int-top">
           <div>
             <R c="r"><Eyebrow text="Integrations" /></R>
             <R c="r" d="d1">
@@ -640,7 +646,7 @@ function CTA() {
         {/* Decorative text */}
         <div style={{ position: "absolute", bottom: -60, left: -20, fontFamily: "var(--font-head)", fontWeight: 800, fontSize: "clamp(100px,16vw,220px)", lineHeight: 1, color: "rgba(255,255,255,.035)", pointerEvents: "none", userSelect: "none", letterSpacing: "-.05em" }}>FYNOVO</div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 88, alignItems: "center" }}>
+        <div className="cta-grid">
           <div>
             <R c="r">
               <div style={{ marginBottom: 28 }}>
@@ -691,7 +697,7 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="container">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", padding: "64px 0 52px", borderBottom: "1px solid rgba(255,255,255,.08)" }}>
+        <div className="footer-grid">
           {cols.map(({ h, links }, i) => (
             <div key={h} style={{ padding: "0 40px", borderRight: i < 3 ? "1px solid rgba(255,255,255,.08)" : "none" }}>
               <div className="footer-head">{h}</div>
@@ -699,7 +705,7 @@ function Footer() {
             </div>
           ))}
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "28px 0" }}>
+        <div className="footer-bottom">
           <a href="#" className="footer-logo">Fy<em>novo</em></a>
           <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "rgba(255,255,255,.2)", letterSpacing: ".1em", textTransform: "uppercase" }}>
             © 2025 Fynovo Technologies Pvt. Ltd. — All Rights Reserved
