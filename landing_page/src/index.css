@@ -529,3 +529,47 @@ body{
   /* Hiding desktop nav links */
   .nav-links { display: none !important; }
 }
+
+/* ========================================================== POWERED BY (TECH VASEEGRAH) */
+.powered-by-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 50px;
+  gap: 16px;
+}
+.powered-by-logo {
+  height: 52px;
+  width: auto;
+  border-radius: 6px;
+  object-fit: contain;
+  border: 1px solid rgba(255,255,255,.1);
+}
+.powered-by-text-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+.powered-by-text-wrap span:first-child {
+  font-size: 11px;
+}
+.powered-by-text-wrap span:last-child {
+  font-size: 24px;
+}
+
+@media (max-width: 768px) {
+  .powered-by-container {
+    padding-bottom: 32px;
+    gap: 12px;
+  }
+  .powered-by-logo {
+    height: 36px;
+  }
+  .powered-by-text-wrap span:first-child {
+    font-size: 9px;
+  }
+  .powered-by-text-wrap span:last-child {
+    font-size: 18px;
+  }
+}

@@ -205,10 +205,10 @@ function Nav() {
         <a href="#hero" className="nav-logo">Fy<em>novo</em></a>
         <ul className={`nav-links${isOpen ? " open" : ""}`}>
           {["Platform", "Pricing", "Integrations", "Journal"].map(l => (
-            <li key={l}><a href={`#${l.toLowerCase()}`} onClick={toggleMenu}>{l}</a></li>
+            <li key={l}><a href={`#${l.toLowerCase()}`}>{l}</a></li>
           ))}
         </ul>
-        <button className="btn btn-primary btn-sm d-none-mobile ripple glow-hover">Open Account →</button>
+        <a href="https://fynovo.in/" className="btn btn-primary btn-sm d-none-mobile ripple glow-hover">Open Account →</a>
         <button className="hamburger" onClick={toggleMenu} aria-label="Toggle Menu" aria-expanded={isOpen}>
           <span></span><span></span><span></span>
         </button>
@@ -225,7 +225,7 @@ function Nav() {
             {["Platform", "Pricing", "Integrations", "Journal"].map(l => (
               <a key={l} href={`#${l.toLowerCase()}`} className="mobile-link" onClick={toggleMenu}>{l}</a>
             ))}
-            <button className="btn btn-primary btn-full ripple glow-hover" style={{ marginTop: 20 }}>Open Account →</button>
+            <a href="https://fynovo.in/" className="btn btn-primary btn-full ripple glow-hover" style={{ marginTop: 20 }}>Open Account →</a>
           </div>
         </div>
       )}
@@ -236,7 +236,7 @@ function Nav() {
 /* ========================================================== HERO */
 function Hero() {
   return (
-    <section style={{ minHeight: "100vh", paddingTop: 68, background: "var(--bg)", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+    <section id="hero" style={{ minHeight: "100vh", paddingTop: 68, background: "var(--bg)", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
       {/* Animated background blobs */}
       <div style={{ position: "absolute", top: -180, right: -160, width: 640, height: 640, borderRadius: "50%", background: "radial-gradient(circle, var(--primary-pale) 0%, transparent 68%)", pointerEvents: "none", zIndex: 0, animation: "blobDrift 12s ease-in-out infinite" }} />
       <div style={{ position: "absolute", bottom: 40, left: -100, width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, var(--primary-bg) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0, animation: "blobDrift 16s ease-in-out infinite reverse" }} />
@@ -290,7 +290,7 @@ function Hero() {
           {/* CTAs */}
           <R c="r" d="d4">
             <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
-              <button className="btn btn-primary btn-lg">Start Free — ₹0</button>
+              <a href="https://fynovo.in/" className="btn btn-primary btn-lg">Start Free — ₹0</a>
               <button className="btn btn-ghost">
                 <span style={{ width: 32, height: 32, borderRadius: "50%", border: "1.5px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "var(--primary)" }}>▷</span>
                 Watch 90s demo
@@ -378,7 +378,7 @@ const FEATS = [
 
 function Features() {
   return (
-    <section className="section">
+    <section id="platform" className="section">
       <div className="container">
         <div className="feat-grid">
           <div>
@@ -499,9 +499,9 @@ function DeepFeat({ tag, h1, hBold, body, checks, imgLabel, imgNum, imgType = "c
 /* ========================================================== PRICING */
 function Pricing() {
   const plans = [
-    { name: "Starter", price: "499", per: "per month / billed annually", feats: ["Single income source","Basic expense tracking","1 GB data storage","Email support"], btnClass: "btn-outline", btnText: "Get Started" },
+    { name: "Starter", price: "499", per: "per month / billed annually", feats: ["Single income source","Basic expense tracking","1 GB data storage","Email support"], btnClass: "btn-primary", btnText: "Get Started" },
     { name: "Professional", price: "1,499", per: "per month / billed annually", feats: ["Unlimited income sources","AI Financial Advisor","Full Tax Engine (GST/TDS)","5-year asset projections","SmartBorrow strategy"], btnClass: "btn-primary", btnText: "Start Free Trial", featured: true },
-    { name: "Enterprise", price: null, per: "Contact for a custom quote", feats: ["Multi-tenant architecture","Custom API integrations","Dedicated account manager","Advanced audit trails","SLA guarantee"], btnClass: "btn-ghost", btnText: "Contact Sales" },
+    { name: "Enterprise", price: null, per: "Contact for a custom quote", feats: ["Multi-tenant architecture","Custom API integrations","Dedicated account manager","Advanced audit trails","SLA guarantee"], btnClass: "btn-primary", btnText: "Contact Sales" },
   ];
   return (
     <section id="pricing" className="section" style={{ borderTop: "1px solid var(--border-light)" }}>
@@ -535,7 +535,7 @@ function Pricing() {
                     <div key={f} className="price-feat"><div className="price-check">✓</div>{f}</div>
                   ))}
                 </div>
-                <button className={`btn ${btnClass} btn-full`} style={{ marginTop: 28 }}>{btnText}</button>
+                <a href="https://fynovo.in/" className={`btn ${btnClass} btn-full`} style={{ marginTop: 28 }}>{btnText}</a>
               </div>
             ))}
           </div>
@@ -557,7 +557,7 @@ const TESTIS = [
 
 function Testimonials() {
   return (
-    <section className="section section-alt" style={{ borderTop: "1px solid var(--border-light)" }}>
+    <section id="journal" className="section section-alt" style={{ borderTop: "1px solid var(--border-light)" }}>
       <div className="container">
         <div className="testi-grid-main">
           <div style={{ position: "sticky", top: 88 }}>
@@ -662,7 +662,7 @@ function CTA() {
             </R>
             <R c="r" d="d2">
               <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
-                <button className="btn btn-white btn-lg">Open Free Account</button>
+                <a href="https://fynovo.in/" className="btn btn-white btn-lg">Open Free Account</a>
                 <button className="btn btn-white-outline btn-lg">See Pricing</button>
               </div>
               <p style={{ marginTop: 16, fontFamily: "var(--font-mono)", fontSize: 10, color: "rgba(255,255,255,.38)", letterSpacing: ".12em", textTransform: "uppercase" }}>
@@ -705,13 +705,27 @@ function Footer() {
             </div>
           ))}
         </div>
-        <div className="footer-bottom">
-          <a href="#" className="footer-logo">Fy<em>novo</em></a>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "rgba(255,255,255,.2)", letterSpacing: ".1em", textTransform: "uppercase" }}>
-            © 2025 Fynovo Technologies Pvt. Ltd. — All Rights Reserved
-          </span>
+        <div className="footer-bottom" style={{ borderBottom: "1px solid rgba(255,255,255,.08)", margin: "0 0 24px 0", paddingBottom: "24px", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <a href="#" className="footer-logo">Fy<em>novo</em></a>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "rgba(255,255,255,.2)", letterSpacing: ".1em", textTransform: "uppercase" }}>
+              © 2026 <a href="https://techvaseegrah.com/" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(255,255,255,.2)", textDecoration: "none" }}>Tech Vaseegrah</a> — All Rights Reserved
+            </span>
+          </div>
           <div className="badge badge-green" style={{ fontSize: 9 }}><span className="badge-dot" />Made in India</div>
         </div>
+
+        <a href="https://techvaseegrah.com/" target="_blank" rel="noopener noreferrer" className="powered-by-container" style={{ textDecoration: 'none' }}>
+          <img src="images/tech_vaseegrah_logo.jpeg" alt="Tech Vaseegrah Logo" className="powered-by-logo" />
+          <div className="powered-by-text-wrap">
+             <span style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,.4)", letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 2, lineHeight: 1 }}>
+               Powered by
+             </span>
+             <span style={{ fontFamily: "var(--font-head)", color: "rgba(255,255,255,.9)", letterSpacing: "1px", fontWeight: 700, textTransform: "uppercase", lineHeight: 1 }}>
+               Tech Vaseegrah
+             </span>
+          </div>
+        </a>
       </div>
     </footer>
   );
